@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
+import { login } from '../services/api'
 import './LoginPage.css'
 
 export default function LoginPage() {
@@ -46,14 +47,20 @@ export default function LoginPage() {
     }
 
     setLoading(true)
+    setErrors({})
 
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1500))
-
-    setLoading(false)
-    alert(`Selamat datang, ${form.email}! ✅`)
-    // After successful login, navigate to dashboard (or landing for now)
-    navigate('/')
+    try {
+      const res = await login(form.email, form.password)
+      localStorage.setItem('token', res.data.token)
+      navigate('/dashboard')
+    } catch (err) {
+      const msg = err.response?.data?.message
+        || err.response?.data?.errors?.email?.[0]
+        || 'Email atau password salah.'
+      setErrors({ api: msg })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -64,14 +71,14 @@ export default function LoginPage() {
       <div className="login-panel">
         <div className="panel-overlay"></div>
         <img
-          src="https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=800&q=80"
+          src="https://i.pinimg.com/736x/c2/92/a1/c292a15c40601048aecd56aa95ff86a9.jpg"
           alt="eco background"
           className="panel-img"
         />
         <div className="panel-content">
           <div className="panel-logo">
             <span>♻</span>
-            <span>Trecycling</span>
+            <span>Ecovan</span>
           </div>
           <blockquote className="panel-quote">
             "Setiap tindakan kecilmu hari ini adalah investasi terbesar untuk bumi anak cucumu."
@@ -156,6 +163,10 @@ export default function LoginPage() {
               </label>
               <a href="#" className="forgot-link">Lupa password?</a>
             </div>
+
+            {errors.api && (
+              <div className="api-error">⚠ {errors.api}</div>
+            )}
 
             <button type="submit" className="submit-btn" disabled={loading}>
               {loading ? (

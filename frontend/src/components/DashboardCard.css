@@ -1,0 +1,61 @@
+.dash-card {
+  background: var(--cream-light);
+  border: 1px solid rgba(74,140,92,0.15);
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: box-shadow 0.2s;
+}
+
+.dash-card:hover {
+  box-shadow: 0 4px 20px rgba(45,90,61,0.1);
+}
+
+.dash-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dash-card__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-light);
+}
+
+.dash-card__icon {
+  font-size: 1.4rem;
+}
+
+.dash-card__value {
+  font-family: 'Fraunces', serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.1;
+}
+
+.dash-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.dash-card__badge {
+  background: #d4edda;
+  color: #2d6a4f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.dash-card__trend {
+  font-size: 0.75rem;
+  color: var(--text-light);
+}

@@ -1,0 +1,39 @@
+.iw-chart {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid rgba(74,140,92,0.12);
+}
+
+.iw-chart__header {
+  margin-bottom: 20px;
+}
+
+.iw-chart__title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.iw-chart__subtitle {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.iw-tooltip {
+  background: #fff;
+  border: 1px solid rgba(74,140,92,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.83rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.iw-tooltip__year {
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text-dark);
+}

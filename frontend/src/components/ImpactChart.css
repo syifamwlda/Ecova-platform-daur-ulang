@@ -1,0 +1,178 @@
+.impact-chart {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(74,140,92,0.12);
+}
+
+.impact-chart__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.impact-chart__title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.impact-chart__period {
+  font-size: 0.8rem;
+  color: var(--leaf);
+  font-weight: 600;
+  background: rgba(74,140,92,0.1);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* Monthly */
+.impact-chart__monthly { margin-bottom: 24px; }
+
+.impact-monthly__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-light);
+  margin-bottom: 2px;
+}
+
+.impact-monthly__target {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.impact-monthly__bar-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(74,140,92,0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.impact-monthly__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--leaf), var(--sage));
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+.impact-monthly__info {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+/* Pie */
+.impact-chart__bottom {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.impact-chart__pie-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.impact-chart__center-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.impact-chart__center-text {
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--text-light);
+  text-transform: uppercase;
+}
+
+.impact-chart__center-value {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.impact-chart__legend-col { flex: 1; }
+
+.impact-chart__legend-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-light);
+  margin-bottom: 12px;
+}
+
+.impact-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--cream-light);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.impact-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.impact-legend-name {
+  flex: 1;
+  color: var(--text-dark);
+}
+
+.impact-legend-pct {
+  font-weight: 700;
+  color: var(--leaf);
+  font-size: 0.8rem;
+}
+
+.impact-chart__color-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.impact-color-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--text-mid);
+}
+
+.impact-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.impact-tooltip {
+  background: #fff;
+  border: 1px solid rgba(74,140,92,0.2);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}

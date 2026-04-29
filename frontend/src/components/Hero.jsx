@@ -26,7 +26,7 @@ export default function Hero() {
 
         <p className="hero-desc">
           Bergabunglah bersama ribuan warga yang telah mengubah sampah menjadi
-          manfaat nyata. Bersama Trecycling, setiap tindakan kecil menciptakan
+          manfaat nyata. Bersama Ecovan, setiap tindakan kecil menciptakan
           dampak besar bagi bumi kita.
         </p>
 
