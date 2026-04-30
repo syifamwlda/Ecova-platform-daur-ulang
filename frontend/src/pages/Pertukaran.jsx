@@ -8,50 +8,17 @@ import {
   formatRupiah,
   WASTE_TYPE_LABELS,
 } from '../services/wasteApi';
+import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
 
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-const Sidebar = () => {
-  const navigate = useNavigate();
-  const path = window.location.pathname;
-  const items = [
-    { icon: '⊞', label: 'Dashboard',   to: '/dashboard' },
-    { icon: '↔', label: 'Pertukaran',  to: '/pertukaran' },
-    { icon: '🛒', label: 'Marketplace', to: '/marketplace' },
-    { icon: '📋', label: 'Pesanan',     to: '/pesanan' },
-    { icon: '💳', label: 'Pembayaran',  to: '/pembayaran' },
-    { icon: '👤', label: 'Profil',      to: '/profil' },
-  ];
-  return (
-    <aside style={S.sidebar}>
-      <div style={S.logo}>EcoRuk</div>
-      <nav style={S.nav}>
-        {items.map((i) => (
-          <button
-            key={i.to}
-            onClick={() => navigate(i.to)}
-            style={{ ...S.navItem, ...(path === i.to ? S.navActive : {}) }}
-          >
-            <span style={S.navIcon}>{i.icon}</span>
-            <span>{i.label}</span>
-          </button>
-        ))}
-      </nav>
-      <button style={S.logout}>↩ Keluar</button>
-    </aside>
-  );
-};
-
-// ─── Gambar per tipe sampah - pakai picsum dengan seed tetap ─────────────────
-// seed tetap = gambar selalu sama, tidak random
+// Gambar per tipe sampah 
 const WASTE_IMAGES = {
-  pet_plastik:   'https://i.pinimg.com/1200x/de/fc/f7/defcf7773f9d794d63d3fdbcacac8b2a.jpg', // botol plastik PET bening
-  serat_kertas:  'https://images.unsplash.com/photo-1589384267710-7a170981ca78?w=700&q=80', // tumpukan kertas/kardus
-  plastic_fiber: 'https://images.unsplash.com/photo-1611284446314-60a58ac0debb?w=700&q=80', // sampah plastik campur
-  plastik:       'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=700&q=80', // plastik daur ulang
-  kardus:        'https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=700&q=80', // kardus
+  pet_plastik:   'https://i.pinimg.com/1200x/de/fc/f7/defcf7773f9d794d63d3fdbcacac8b2a.jpg',
+  serat_kertas:  'https://i.pinimg.com/736x/b3/ba/61/b3ba61d4a03dbaa9b7057d7136524299.jpg',
+  plastik:       'https://i.pinimg.com/1200x/6e/97/b4/6e97b442c26192429d881df203e96dda.jpg',
+  kardus:        'https://i.pinimg.com/736x/4e/91/2b/4e912bad7dc1f46a1fa3434342b4c4c4.jpg',
 };
 
-// Fallback SVG inline jika gambar gagal load
 const FallbackCamera = ({ wasteType }) => {
   const colors = { pet_plastik:'#a8d8ea', aluminum:'#b0bec5', serat_kertas:'#d7ccc8', plastic_fiber:'#c5cae9', plastik:'#c8e6c9', kardus:'#bcaaa4' };
   const c = colors[wasteType] || '#c8e6c9';
@@ -77,7 +44,6 @@ const CameraView = ({ wasteType, processing }) => {
   const [imgError, setImgError] = useState(false);
   const [imgSrc, setImgSrc]     = useState(WASTE_IMAGES[wasteType] || WASTE_IMAGES.plastik);
 
-  // Reset error ketika tipe berubah
   useEffect(() => {
     setImgError(false);
     setImgSrc(WASTE_IMAGES[wasteType] || WASTE_IMAGES.plastik);
@@ -93,17 +59,12 @@ const CameraView = ({ wasteType, processing }) => {
         style={S.cameraImg}
         onError={() => setImgError(true)}
       />
-      {/* overlay gelap */}
       <div style={S.camOverlay} />
-
-      {/* scan line animasi */}
       {processing && (
         <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none', zIndex:4 }}>
           <div style={{ ...S.scanLine, animation:'scanMove 1.2s ease-in-out infinite' }} />
         </div>
       )}
-
-      {/* QR frame corners kuning */}
       <div style={S.qrFrameWrap}>
         <div style={S.qrBox}>
           <div style={{ ...S.corner, top:0, left:0,   borderRight:'none', borderBottom:'none' }} />
@@ -116,6 +77,291 @@ const CameraView = ({ wasteType, processing }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+// ─── Optimasi Nilai Sampah ────────────────────────────────────────────────────
+const OptimisiSection = () => {
+  const multipliers = [
+    {
+      icon: '◈',
+      title: 'Kualitas Bersih',
+      desc: 'Material tanpa kontaminasi menghasilkan nilai lebih tinggi',
+      value: '1,2%',
+      label: 'PENGGANDA HASIL',
+      color: '#e8f4ea',
+      iconColor: '#2d7a3a',
+    },
+    {
+      icon: '↗',
+      title: 'Jumlah Banyak',
+      desc: 'Volume besar meningkatkan efisiensi dan nilai',
+      value: '1,8%',
+      label: 'PENGGANDA HASIL',
+      color: '#e8f4ea',
+      iconColor: '#2d7a3a',
+    },
+    {
+      icon: '⏱',
+      title: 'Waktu Tepat',
+      desc: 'Harga mengikuti permintaan pasar secara dinamis',
+      value: '1,5%',
+      label: 'PENGGANDA HASIL',
+      color: '#e8f4ea',
+      iconColor: '#2d7a3a',
+    },
+  ];
+
+  const pasarItems = [
+    { color: '#2d7a3a', label: 'PET Plastik', sub: 'Kemurnian Tinggi', price: 'Rp 6.000', unit: '/kg', trend: '+4.5%', up: true },
+    { color: '#e67e22', label: 'Serat Kertas', sub: 'Kraft', price: 'Rp 3.000', unit: '/kg', trend: '-42.5%', up: false },
+  ];
+
+  return (
+    <section style={S.optimasiSection}>
+      <style>{`
+        @keyframes boostPulse { 0%,100%{box-shadow:0 0 0 0 rgba(45,122,58,0.25)} 50%{box-shadow:0 0 0 6px rgba(45,122,58,0)} }
+      `}</style>
+      <div style={S.optimasiHeader}>
+        <div>
+          <h2 style={S.sectionTitle}>Optimasi Nilai Sampah</h2>
+        </div>
+        <div style={S.boostBadge}>
+          <span style={S.boostDot} />
+          Boost Aktif
+        </div>
+      </div>
+
+      <div style={S.optimasiGrid}>
+        {/* Left: multiplier cards */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+          {multipliers.map((m) => (
+            <div key={m.title} style={S.multCard}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
+                <div style={{ ...S.multIcon, backgroundColor: m.color, color: m.iconColor }}>{m.icon}</div>
+              </div>
+              <div style={S.multTitle}>{m.title}</div>
+              <p style={S.multDesc}>{m.desc}</p>
+              <div style={S.multValue}>{m.value}</div>
+              <div style={S.multLabel}>{m.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Right: Pasar Sampah */}
+        <div style={S.pasarCard}>
+          <div style={S.pasarTitle}>Pasar Sampah</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {pasarItems.map((p) => (
+              <div key={p.label} style={S.pasarItem}>
+                <div style={{ ...S.pasarDot, backgroundColor: p.color }} />
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:13, fontWeight:600, color:'#1a1a1a' }}>{p.label}</div>
+                  <div style={{ fontSize:11, color:'#aaa' }}>{p.sub}</div>
+                </div>
+                <div style={{ textAlign:'right' }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#1a1a1a' }}>
+                    {p.price}<span style={{ fontSize:11, color:'#aaa', fontWeight:400 }}>{p.unit}</span>
+                  </div>
+                  <div style={{
+                    fontSize:11,
+                    fontWeight:600,
+                    color: p.up === true ? '#2d7a3a' : p.up === false ? '#e53935' : '#888',
+                  }}>{p.trend}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={S.insightBox}>
+            <div style={S.insightLabel}>INSIGHT</div>
+            <p style={S.insightText}>
+              Nilai PET mencapai puncaknya karena kekurangan pasokan sekali di sektor Uni Eropa.
+              Prioritaskan protokol pemilahan.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ─── Tugas Harian ─────────────────────────────────────────────────────────────
+const TugasSection = () => {
+  const missions = [
+    {
+      badge: 'MISI HARIAN',
+      badgeColor: '#2d7a3a',
+      title: 'Misi Harian: Bersihkan 5 PET Botol',
+      desc: 'Pindai (scan) 5 wadah plastik PET berbeda yang telah diberi label. Jadilah ini memastikan kemurnian material yang lebih tinggi untuk proses daur ulang.',
+      rewardLabel: 'Hadiah',
+      rewardValue: 'Rp 2.500',
+      progress: '3/5',
+      progressPct: 60,
+      dark: true,
+    },
+    {
+      badge: 'SPESIAL MINGGUAN',
+      badgeColor: '#f5c842',
+      badgeTextColor: '#7a5e00',
+      title: 'Bonus Khusus: Weekend Aluminum Bonus',
+      desc: 'Semua skrap atau limbah aluminium yang diproses aktif pekan ini akan menerima pengganda nilai premium, jangan lewatkan kesempatan pasar permintaan pasar sedang melonjak!',
+      rewardLabel: 'Presentase',
+      rewardValue: '15%',
+      showChart: true,
+      dark: false,
+    },
+    {
+      badge: 'MISI MASTER',
+      badgeColor: '#1a1a1a',
+      title: 'Tantangan Progresif: Fiber Master Class',
+      desc: 'Setelah total 20kg kardus dalam satu minggu untuk mendapatkan lencana "Fiber Stronx" dan membuka akses ke tingkatan (tier) yang lebih tinggi.',
+      rewardLabel: 'Progress',
+      rewardValue: '12.4 / 20 kg',
+      progressPct: 62,
+      showProgress: true,
+      dark: false,
+    },
+  ];
+
+  return (
+    <section style={S.tugasSection}>
+      <h2 style={S.sectionTitle}>Kerjakan Tugas Harian Dan Claim Rewardnya</h2>
+      <p style={S.sectionDesc}>Tingkatkan penghijauan mu dengan menyelesaikan tugas harian mu</p>
+      <div style={S.tugasGrid}>
+        {missions.map((m) => (
+          <div
+            key={m.title}
+            style={{
+              ...S.tugasCard,
+              backgroundColor: m.dark ? '#1a4a2e' : '#fff',
+              color: m.dark ? '#fff' : '#1a1a1a',
+            }}
+          >
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
+              <div style={{
+                ...S.tugasBadge,
+                backgroundColor: m.dark ? 'rgba(255,255,255,0.15)' : (m.badgeColor === '#f5c842' ? '#fff8dc' : '#f0f7f1'),
+                color: m.badgeTextColor || (m.dark ? '#fff' : m.badgeColor),
+              }}>
+                {m.badge}
+              </div>
+            </div>
+
+            <div style={{ fontSize:14, fontWeight:700, marginBottom:10, lineHeight:1.4 }}>{m.title}</div>
+            <p style={{ fontSize:12, lineHeight:1.6, color: m.dark ? 'rgba(255,255,255,0.65)' : '#888', margin:'0 0 16px' }}>
+              {m.desc}
+            </p>
+
+            <div style={{ marginTop:'auto' }}>
+              <div style={{ fontSize:11, color: m.dark ? 'rgba(255,255,255,0.5)' : '#aaa', marginBottom:4 }}>{m.rewardLabel}</div>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div style={{ fontSize:15, fontWeight:700, color: m.dark ? '#7dd87d' : '#2d7a3a' }}>{m.rewardValue}</div>
+                {m.progress && (
+                  <div style={{ fontSize:13, fontWeight:600, color: m.dark ? 'rgba(255,255,255,0.5)' : '#aaa' }}>{m.progress}</div>
+                )}
+                {m.showChart && (
+                  <svg width="44" height="28" viewBox="0 0 44 28">
+                    <polyline points="0,22 8,16 16,18 24,10 32,12 44,4" fill="none" stroke="#2d7a3a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+                {m.showProgress && (
+                  <div style={S.progCircleWrap}>
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#e0e0e0" strokeWidth="3"/>
+                      <circle cx="18" cy="18" r="14" fill="none" stroke="#2d7a3a" strokeWidth="3"
+                        strokeDasharray={`${(m.progressPct / 100) * 88} 88`}
+                        strokeLinecap="round"
+                        transform="rotate(-90 18 18)"
+                      />
+                    </svg>
+                    <span style={{ position:'absolute', fontSize:8, fontWeight:700, color:'#2d7a3a' }}>↑</span>
+                  </div>
+                )}
+              </div>
+
+              {m.progressPct && !m.showProgress && (
+                <div style={{ marginTop:10 }}>
+                  <div style={{ height:4, borderRadius:4, backgroundColor: m.dark ? 'rgba(255,255,255,0.15)' : '#e8f4ea', overflow:'hidden' }}>
+                    <div style={{ height:'100%', width:`${m.progressPct}%`, backgroundColor: m.dark ? '#7dd87d' : '#2d7a3a', borderRadius:4, transition:'width 0.6s ease' }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// ─── Rangking Poin ────────────────────────────────────────────────────────────
+const RangkingSection = () => {
+  const ranks = [
+    { rank: 1,  name: 'Rizky R',  city: 'Bandung INA', total: 'Rp 250 juta', tags: ['GADO BERSIH', 'PEMIMPIN MASTER'], initials: 'R', color: '#2d7a3a' },
+    { rank: 2,  name: 'Rico M',   city: 'Bali INA',    total: 'Rp 100 juta', tags: ['GADO BERSIH', 'GRADE A+'],        initials: 'R', color: '#888' },
+    { rank: 3,  name: 'Yrumm',    city: 'Bali INA',    total: 'Rp 40 juta',  tags: ['GADO BERSIH', 'GRADE B+'],        initials: 'Y', color: '#e6b800' },
+    { rank: 4,  name: 'Tora R',   city: 'Bandung INA', total: 'Rp 10 juta',  tags: ['GADO BERSIH', 'GRADE C+'],        initials: 'T', color: '#c0392b' },
+  ];
+
+  const rankBg = { 1:'#1a4a2e', 2:'#f0f7f1', 3:'#fff8e1', 4:'#fce4e4' };
+  const rankTextColor = { 1:'#fff', 2:'#1a1a1a', 3:'#1a1a1a', 4:'#1a1a1a' };
+
+  return (
+    <section style={S.rangkingSection}>
+      <h2 style={S.sectionTitle}>Rangking Poin Di Papan Peringkat</h2>
+      <p style={S.sectionDesc}>Top kontribusi bulan ini apakah ada kamu juga disini?</p>
+
+      <div style={S.rangkingGrid}>
+        {ranks.map((r) => (
+          <div key={r.rank} style={{ ...S.rangkingCard, backgroundColor: rankBg[r.rank] }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+              <div style={{
+                ...S.rankBadge,
+                backgroundColor: r.rank === 1 ? 'rgba(255,255,255,0.2)' : '#1a4a2e',
+                color: r.rank === 1 ? '#fff' : '#fff',
+              }}>
+                RANK #{r.rank}
+              </div>
+            </div>
+
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:16 }}>
+              <div style={{
+                width:44, height:44, borderRadius:'50%',
+                backgroundColor: r.color,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:16, fontWeight:700, color:'#fff', flexShrink:0,
+              }}>
+                {r.initials}
+              </div>
+              <div>
+                <div style={{ fontSize:15, fontWeight:700, color: rankTextColor[r.rank] }}>{r.name}</div>
+                <div style={{ fontSize:11, color: r.rank === 1 ? 'rgba(255,255,255,0.6)' : '#aaa' }}>{r.city}</div>
+              </div>
+            </div>
+
+            <div style={{ fontSize:10, color: r.rank === 1 ? 'rgba(255,255,255,0.5)' : '#aaa', marginBottom:4 }}>
+              TOTAL PENDAPATAN
+            </div>
+            <div style={{ fontSize:18, fontWeight:700, color: r.rank === 1 ? '#7dd87d' : '#2d7a3a', marginBottom:14 }}>
+              {r.total}
+            </div>
+
+            <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+              {r.tags.map((tag) => (
+                <span key={tag} style={{
+                  fontSize:9, fontWeight:700, letterSpacing:0.5,
+                  padding:'3px 8px', borderRadius:20,
+                  backgroundColor: r.rank === 1 ? 'rgba(255,255,255,0.15)' : '#e8f4ea',
+                  color: r.rank === 1 ? '#b0ffb8' : '#2d7a3a',
+                }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 };
 
@@ -217,11 +463,10 @@ export default function Pertukaran() {
 
           {/* LEFT */}
           <div>
-            {/* READY */}
             {scanState === 'ready' && (
               <div style={S.readyCard}>
                 <img
-                  src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=500&q=80"
+                  src="https://i.pinimg.com/1200x/01/0c/f5/010cf54e0052478503b559dec9d59a4c.jpg"
                   alt="Daur ulang"
                   style={S.readyImg}
                 />
@@ -238,7 +483,6 @@ export default function Pertukaran() {
               </div>
             )}
 
-            {/* SCANNING */}
             {scanState === 'scanning' && (
               <div style={S.scanCard}>
                 <div ref={flashRef} style={S.flash} />
@@ -368,9 +612,14 @@ export default function Pertukaran() {
             ))}
           </div>
         </section>
+
+        {/* ── NEW SECTIONS ─────────────────────────────────────────────────── */}
+        <OptimisiSection />
+        <TugasSection />
+        <RangkingSection />
+
       </main>
     </div>
-    
   );
 }
 
@@ -446,4 +695,39 @@ const S = {
 
   protoGrid: { display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16 },
   protoCard: { backgroundColor:'#fff', borderRadius:12, padding:20 },
+
+  // ── Optimasi ──────────────────────────────────────────────────────────────
+  optimasiSection: { marginBottom:40 },
+  optimasiHeader:  { display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 },
+  sectionTitle:    { fontSize:22, fontWeight:700, color:'#1a1a1a', margin:'0 0 6px' },
+  sectionDesc:     { fontSize:13, color:'#888', margin:0 },
+  boostBadge:      { display:'inline-flex', alignItems:'center', gap:7, padding:'6px 14px', borderRadius:20, backgroundColor:'#e8f4ea', fontSize:12, fontWeight:600, color:'#2d7a3a', border:'1px solid #b8dfc0', animation:'boostPulse 2.5s ease infinite' },
+  boostDot:        { width:7, height:7, borderRadius:'50%', backgroundColor:'#2d7a3a', display:'inline-block' },
+  optimasiGrid:    { display:'grid', gridTemplateColumns:'1fr 280px', gap:20 },
+  multCard:        { backgroundColor:'#fff', borderRadius:14, padding:20, display:'flex', flexDirection:'column' },
+  multIcon:        { width:36, height:36, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, fontWeight:700 },
+  multTitle:       { fontSize:14, fontWeight:700, color:'#1a1a1a', marginBottom:6 },
+  multDesc:        { fontSize:12, color:'#888', lineHeight:1.5, flex:1, margin:'0 0 16px' },
+  multValue:       { fontSize:22, fontWeight:800, color:'#2d7a3a', marginBottom:2 },
+  multLabel:       { fontSize:9, fontWeight:700, letterSpacing:1, color:'#aaa' },
+  pasarCard:       { backgroundColor:'#fff', borderRadius:14, padding:18 },
+  pasarTitle:      { fontSize:14, fontWeight:700, color:'#1a1a1a', marginBottom:14 },
+  pasarItem:       { display:'flex', alignItems:'center', gap:10, padding:'8px 0', borderBottom:'1px solid #f0f0eb' },
+  pasarDot:        { width:32, height:32, borderRadius:8, flexShrink:0 },
+  insightBox:      { marginTop:14, backgroundColor:'#f9f9f6', borderRadius:10, padding:12 },
+  insightLabel:    { fontSize:9, fontWeight:700, letterSpacing:1, color:'#aaa', marginBottom:6 },
+  insightText:     { fontSize:11, color:'#666', lineHeight:1.6, margin:0 },
+
+  // ── Tugas ─────────────────────────────────────────────────────────────────
+  tugasSection: { marginBottom:40 },
+  tugasGrid:    { display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:18, marginTop:20 },
+  tugasCard:    { borderRadius:16, padding:20, display:'flex', flexDirection:'column', minHeight:260 },
+  tugasBadge:   { fontSize:9, fontWeight:700, letterSpacing:0.8, padding:'4px 10px', borderRadius:20 },
+  progCircleWrap: { position:'relative', display:'flex', alignItems:'center', justifyContent:'center', width:36, height:36 },
+
+  // ── Rangking ──────────────────────────────────────────────────────────────
+  rangkingSection: { marginBottom:48 },
+  rangkingGrid:    { display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16, marginTop:20 },
+  rangkingCard:    { borderRadius:16, padding:20 },
+  rankBadge:       { fontSize:9, fontWeight:700, letterSpacing:0.8, padding:'4px 10px', borderRadius:20 },
 };

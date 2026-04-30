@@ -21,7 +21,7 @@ export default function Navbar() {
       <div className="navbar-inner">
         <div className="navbar-logo" onClick={() => navigate('/')}>
           <span className="logo-icon">♻</span>
-          <span className="logo-text">Ecovan</span>
+          <span className="logo-text">Ecova</span>
         </div>
 
         <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>

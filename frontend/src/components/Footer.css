@@ -1,6 +1,6 @@
 .eco-footer {
   background: var(--forest);
-  color: var(--sage);
+  color: var(--green);
   padding: 52px 40px 28px;
   margin-top: 48px;
 }
@@ -13,7 +13,7 @@
 }
 
 .eco-footer__logo {
-  font-family: 'Fraunces', serif;
+  font-family: 'Inter', serif;
   font-size: 1.6rem;
   font-weight: 700;
   color: var(--mint);

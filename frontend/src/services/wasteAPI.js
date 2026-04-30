@@ -1,7 +1,5 @@
-// src/services/wasteApi.js
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
-// ✅ Token selalu disertakan di setiap request
 const getHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -67,7 +65,6 @@ export const WASTE_TYPE_LABELS = {
 
 export const WASTE_PRICES = {
   pet_plastik:   6000,
-  aluminum:      12000,
   serat_kertas:  3000,
   plastic_fiber: 5500,
   plastik:       4000,

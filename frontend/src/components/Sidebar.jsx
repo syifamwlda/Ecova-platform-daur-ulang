@@ -24,7 +24,7 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar__brand">
         <span className="sidebar__leaf">🌿</span>
-        <span className="sidebar__logo">Ecovan</span>
+        <span className="sidebar__logo">Ecova</span>
       </div>
 
       <nav className="sidebar__nav">

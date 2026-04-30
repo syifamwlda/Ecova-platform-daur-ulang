@@ -42,7 +42,7 @@ const PROYEK_TABS = [
     tag: 'Tanam Pohon Mu',
     title: 'Sampahmu, Hutan Masa Depan',
     desc: 'Setiap sampah yang kamu kumpulkan berkontribusi langsung pada penanaman pohon di kawasan hutan yang membutuhkan pemulihan ekosistem.',
-    img: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=900&q=80',
+    img: 'https://i.pinimg.com/736x/a6/ec/2d/a6ec2dec8497850c7b1c090a9d34a3e8.jpg',
     pillIcon: '🌱',
     pillLabel: 'Gabung Gerakan Tanam Pohon Mu',
   },
@@ -51,7 +51,7 @@ const PROYEK_TABS = [
     tag: 'Impact Tindakan',
     title: 'Impact Tindakan',
     desc: 'Lihat dampak nyata dari setiap aksi daur ulangmu dalam angka dan visualisasi yang mudah dipahami oleh semua orang.',
-    img: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=900&q=80',
+    img: 'https://i.pinimg.com/1200x/49/b5/66/49b566ae50cb6ab0ca4106bf54518c4f.jpg',
     pillIcon: '📊',
     pillLabel: 'Lihat Dampak Nyatamu',
   },
@@ -89,7 +89,7 @@ export default function LandingPage() {
 
           <div className="aksi-header">
             <div className="section-label">Proyek Dari Kami</div>
-            <h2>Membangun Aksi Nyata Bersama <em>Ecovan</em></h2>
+            <h2>Membangun Aksi Nyata Bersama <em>Ecova</em></h2>
             <p>Yang Guru Menggugah Semangat, Sebarnya Jadi Sesuatu yang Berguna dan Berarti</p>
           </div>
 
@@ -120,7 +120,7 @@ export default function LandingPage() {
               </div>
               <div className="aksi-wide-body">
                 <span className="aksi-eyebrow-tag">Komunitas</span>
-                <h3>Komunitas Ecovan Waste to Worth Hub</h3>
+                <h3>Komunitas Ecova Waste to Worth Hub</h3>
                 <p>Forum para penggerak perubahan dan pemilah sampah terbaik. Bergabung dan berbagi pengalaman bersama komunitas kami.</p>
                 <button className="aksi-outline-btn" onClick={() => navigate('/login')}>Bergabung</button>
               </div>
@@ -273,7 +273,7 @@ export default function LandingPage() {
         <div className="container">
           <div className="footer-grid">
             <div className="footer-brand">
-              <div className="footer-logo"><span>♻</span><span>Ecovan</span></div>
+              <div className="footer-logo"><span>♻</span><span>Ecova</span></div>
               <p>Platform daur ulang cerdas untuk Indonesia yang lebih hijau.</p>
               <div className="footer-socials">
                 {['📘','📸','🐦','▶️'].map((s,i) => <span key={i} className="social-icon">{s}</span>)}

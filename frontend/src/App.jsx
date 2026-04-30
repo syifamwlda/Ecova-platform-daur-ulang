@@ -7,6 +7,10 @@ import Pembayaran from './pages/Pembayaran';
 import Marketplace from './pages/Marketplace';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import KonfirmasiPembayaran from './pages/KonfirmasiPembayaran';
+import Pesanan from './pages/Pesanan';
+import Profil from './pages/Profil'; // ✅ TAMBAHAN
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -17,26 +21,18 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-
-        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-
+        <Route path="/dashboard"  element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/pertukaran" element={<PrivateRoute><Pertukaran /></PrivateRoute>} />
-
         <Route path="/pembayaran" element={<PrivateRoute><Pembayaran /></PrivateRoute>} />
-
-        {/* ✅ MARKETPLACE */}
         <Route path="/marketplace" element={<PrivateRoute><Marketplace /></PrivateRoute>} />
-
-        {/* ✅ DETAIL PRODUK */}
         <Route path="/products/:id" element={<PrivateRoute><ProductDetail /></PrivateRoute>} />
-
-        {/* ✅ CART */}
         <Route path="/cart" element={<PrivateRoute><Cart /></PrivateRoute>} />
-
-
+        <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
+        <Route path="/konfirmasi-pembayaran" element={<PrivateRoute><KonfirmasiPembayaran /></PrivateRoute>} />
+        <Route path="/pesanan" element={<PrivateRoute><Pesanan /></PrivateRoute>} />
+        <Route path="/profil"  element={<PrivateRoute><Profil /></PrivateRoute>} /> {/* ✅ TAMBAHAN */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

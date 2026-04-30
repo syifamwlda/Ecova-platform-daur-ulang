@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="eco-footer__inner">
         {/* Brand */}
         <div className="eco-footer__brand">
-          <h3 className="eco-footer__logo">Ecovan</h3>
+          <h3 className="eco-footer__logo">Ecova</h3>
           <p className="eco-footer__tagline">
             Menghubungkan pengelolaan sampah dengan dampak nyata melalui
             inovasi, komunitas, dan aksi berkelanjutan untuk masa depan yang
@@ -45,7 +45,7 @@ export default function Footer() {
       </div>
 
       <div className="eco-footer__bottom">
-        <span>© 2026 Ecovan — From Waste to Impact  Built for a Greener Future</span>
+        <span>© 2026 Ecova — From Waste to Impact  Built for a Greener Future</span>
         <div className="eco-footer__bottom-right">
           <span>DESIGN WITH PURPOSE</span>
           <span className="eco-footer__dot">·</span>

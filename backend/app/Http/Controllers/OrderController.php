@@ -13,14 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
-    /**
-     * POST /api/orders
-     * Body: {
-     *   items: [{ product_id, quantity }],
-     *   coupon_code?: string,
-     *   include_donation?: boolean,
-     * }
-     */
+
     public function store(Request $request): JsonResponse
     {
         $request->validate([

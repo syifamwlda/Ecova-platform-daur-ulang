@@ -1,40 +1,35 @@
-// src/pages/ProductDetail.jsx
-// FIXES:
-// 1. handleAddToCart: ditambahkan toast dulu 1 detik LALU navigate ke cart (bukan langsung navigate)
-// 2. addedToast state sekarang berfungsi dengan benar (sebelumnya toast ditampilkan tapi navigate langsung, jadi toast ga pernah keliatan)
-// 3. Stars component: fix logika half-star yang salah (sebelumnya pakai emoji ⭐ yang ga konsisten)
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getProduct, getProducts, addToCart, formatRupiah } from '../services/marketplaceApi';
+import Sidebar from '../components/Sidebar';
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
-const Sidebar = ({ active }) => {
-  const navigate = useNavigate();
-  const items = [
-    { icon: '⊞', label: 'Dashboard', path: '/dashboard' },
-    { icon: '↔', label: 'Pertukaran', path: '/pertukaran' },
-    { icon: '🛒', label: 'Marketplace', path: '/marketplace' },
-    { icon: '📋', label: 'Pesanan', path: '/pesanan' },
-    { icon: '💳', label: 'Pembayaran', path: '/pembayaran' },
-    { icon: '👤', label: 'Profil', path: '/profil' },
-  ];
-  return (
-    <aside style={s.sidebar}>
-      <div style={s.logo}>EcoRuk</div>
-      <nav style={s.nav}>
-        {items.map((item) => (
-          <button key={item.path} onClick={() => navigate(item.path)}
-            style={{ ...s.navItem, ...(active === item.label ? s.navItemActive : {}) }}>
-            <span style={s.navIcon}>{item.icon}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </nav>
-      <button style={s.logoutBtn}>↩ Keluar</button>
-    </aside>
-  );
-};
+// const Sidebar = ({ active }) => {
+//   const navigate = useNavigate();
+//   const items = [
+//     { icon: '⊞', label: 'Dashboard', path: '/dashboard' },
+//     { icon: '↔', label: 'Pertukaran', path: '/pertukaran' },
+//     { icon: '🛒', label: 'Marketplace', path: '/marketplace' },
+//     { icon: '📋', label: 'Pesanan', path: '/pesanan' },
+//     { icon: '💳', label: 'Pembayaran', path: '/pembayaran' },
+//     { icon: '👤', label: 'Profil', path: '/profil' },
+//   ];
+//   return (
+//     <aside style={s.sidebar}>
+//       <div style={s.logo}>EcoRuk</div>
+//       <nav style={s.nav}>
+//         {items.map((item) => (
+//           <button key={item.path} onClick={() => navigate(item.path)}
+//             style={{ ...s.navItem, ...(active === item.label ? s.navItemActive : {}) }}>
+//             <span style={s.navIcon}>{item.icon}</span>
+//             <span>{item.label}</span>
+//           </button>
+//         ))}
+//       </nav>
+//       <button style={s.logoutBtn}>↩ Keluar</button>
+//     </aside>
+//   );
+// };
 
 // ─── Star Rating ──────────────────────────────────────────────────────────────
 // FIX: Sebelumnya logika half-star pakai emoji ⭐ yang ga konsisten tampilannya
@@ -313,7 +308,7 @@ export default function ProductDetail() {
         <footer style={s.footer}>
           <div style={s.footerTop}>
             <div>
-              <div style={s.footerLogo}>Ecoruk</div>
+              <div style={s.footerLogo}>Ecova</div>
               <p style={s.footerTagline}>Menghubungkan pengelolaan sampah dengan dampak nyata melalui inovasi, komunitas, dan aksi berkelanjutan untuk masa depan yang lebih hijau.</p>
             </div>
             {[
@@ -328,7 +323,7 @@ export default function ProductDetail() {
             ))}
           </div>
           <div style={s.footerBottom}>
-            <span>© 2026 Ecoruk — From Waste to Impact  Built for a Greener Future</span>
+            <span>© 2026 Ecova — From Waste to Impact  Built for a Greener Future</span>
             <div style={{ display: 'flex', gap: 24 }}><span>DESIGN WITH PURPOSE</span><span>NEUTRAL ORIGIN</span></div>
           </div>
         </footer>
@@ -436,7 +431,7 @@ const s = {
   reviewAction: { fontSize: 12, color: '#999', cursor: 'pointer' },
   lihatLainnya: { padding: '12px', backgroundColor: 'transparent', border: '1.5px solid #e0e0d8', color: '#555', borderRadius: 10, fontSize: 13, cursor: 'pointer', width: '100%' },
 
-  footer: { backgroundColor: '#111', borderRadius: 20, padding: '40px 48px 24px', color: '#fff' },
+  footer: { backgroundColor: '#1f3e2d', borderRadius: 20, padding: '40px 48px 24px', color: '#fff' },
   footerTop: { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 40, paddingBottom: 32, borderBottom: '1px solid rgba(255,255,255,0.1)' },
   footerLogo: { fontSize: 20, fontWeight: 700, marginBottom: 14 },
   footerTagline: { fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, margin: '0 0 16px', maxWidth: 260 },

@@ -2,37 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProducts, formatRupiah, getCartCount } from '../services/marketplaceApi';
-
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-const Sidebar = ({ active }) => {
-  const navigate = useNavigate();
-  const items = [
-    { icon: '⊞', label: 'Dashboard', path: '/dashboard' },
-    { icon: '↔', label: 'Pertukaran', path: '/pertukaran' },
-    { icon: '🛒', label: 'Marketplace', path: '/marketplace' },
-    { icon: '📋', label: 'Pesanan', path: '/pesanan' },
-    { icon: '💳', label: 'Pembayaran', path: '/pembayaran' },
-    { icon: '👤', label: 'Profil', path: '/profil' },
-  ];
-  return (
-    <aside style={s.sidebar}>
-      <div style={s.logo}>EcoRuk</div>
-      <nav style={s.nav}>
-        {items.map((item) => (
-          <button
-            key={item.path}
-            onClick={() => navigate(item.path)}
-            style={{ ...s.navItem, ...(active === item.label ? s.navItemActive : {}) }}
-          >
-            <span style={s.navIcon}>{item.icon}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </nav>
-      <button style={s.logoutBtn}>↩ Keluar</button>
-    </aside>
-  );
-};
+import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
 const ProductCard = ({ product, onClick }) => (
@@ -146,7 +117,7 @@ export default function Marketplace() {
         <div style={s.heroBanner}>
           <div style={s.heroOverlay} />
           <img
-            src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80"
+            src="https://i.ibb.co.com/xKzz0Zsm/Group-149-1.png"
             alt="Forest"
             style={s.heroBg}
           />
@@ -158,13 +129,7 @@ export default function Marketplace() {
               penjual lokal terverifikasi.
             </p>
           </div>
-          <div style={s.heroImgRight}>
-            <img
-              src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&q=80"
-              alt="Eco person"
-              style={s.heroPersonImg}
-            />
-          </div>
+
         </div>
 
         {/* Filter Berdasarkan Bahan */}
@@ -262,42 +227,6 @@ export default function Marketplace() {
   );
 }
 
-// ─── Footer ───────────────────────────────────────────────────────────────────
-const Footer = () => (
-  <footer style={s.footer}>
-    <div style={s.footerTop}>
-      <div>
-        <div style={s.footerLogo}>Ecoruk</div>
-        <p style={s.footerTagline}>
-          Menghubungkan pengelolaan sampah dengan dampak nyata melalui
-          inovasi, komunitas, dan aksi berkelanjutan untuk masa depan yang lebih hijau.
-        </p>
-        <div style={s.socials}>
-          {['f', 'tt', 'x', 'ig', 'g'].map((x) => (
-            <div key={x} style={s.socialIcon}>{x}</div>
-          ))}
-        </div>
-      </div>
-      {[
-        { head: 'NAVIGASI', links: ['Waste Tracker', 'AI Recommendation', 'Eco Marketplace', 'Community'] },
-        { head: 'IMPACT', links: ['Impact Dashboard', 'Tree Contribution', 'Eco Mission', 'Growth Tracker'] },
-        { head: 'LEGAL', links: ['Privacy Policy', 'Terms of Use', 'Data Protection', 'Safety'] },
-      ].map((col) => (
-        <div key={col.head}>
-          <div style={s.footerColHead}>{col.head}</div>
-          {col.links.map((l) => <div key={l} style={s.footerLink}>{l}</div>)}
-        </div>
-      ))}
-    </div>
-    <div style={s.footerBottom}>
-      <span>© 2026 Ecoruk — From Waste to Impact  Built for a Greener Future</span>
-      <div style={{ display: 'flex', gap: 24 }}>
-        <span>DESIGN WITH PURPOSE</span>
-        <span>NEUTRAL ORIGIN</span>
-      </div>
-    </div>
-  </footer>
-);
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const s = {

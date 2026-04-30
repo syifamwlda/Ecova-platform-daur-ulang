@@ -2,37 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatRupiah } from '../services/wasteApi';
-
-// ─── Sidebar (shared) ─────────────────────────────────────────────────────────
-const Sidebar = ({ active }) => {
-  const navigate = useNavigate();
-  const items = [
-    { icon: '⊞', label: 'Dashboard', path: '/dashboard' },
-    { icon: '↔', label: 'Pertukaran', path: '/pertukaran' },
-    { icon: '🛒', label: 'Marketplace', path: '/marketplace' },
-    { icon: '📋', label: 'Pesanan', path: '/pesanan' },
-    { icon: '💳', label: 'Pembayaran', path: '/pembayaran' },
-    { icon: '👤', label: 'Profil', path: '/profil' },
-  ];
-  return (
-    <aside style={s.sidebar}>
-      <div style={s.logo}>EcoRuk</div>
-      <nav style={s.nav}>
-        {items.map((item) => (
-          <button
-            key={item.path}
-            onClick={() => navigate(item.path)}
-            style={{ ...s.navItem, ...(active === item.label ? s.navItemActive : {}) }}
-          >
-            <span style={s.navIcon}>{item.icon}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </nav>
-      <button style={s.logoutBtn}>↩ Keluar</button>
-    </aside>
-  );
-};
+import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const MOCK_TRANSACTIONS = [
@@ -378,7 +349,7 @@ export default function Pembayaran() {
         <footer style={s.footer}>
           <div style={s.footerTop}>
             <div style={s.footerBrand}>
-              <div style={s.footerLogo}>Ecoruk</div>
+              <div style={s.footerLogo}>Ecova</div>
               <p style={s.footerTagline}>
                 Menghubungkan pengelolaan sampah dengan dampak nyata melalui
                 inovasi, komunitas, dan aksi berkelanjutan untuk masa depan yang lebih hijau.
@@ -403,7 +374,7 @@ export default function Pembayaran() {
             ))}
           </div>
           <div style={s.footerBottom}>
-            <span>© 2026 Ecoruk — From Waste to Impact  Built for a Greener Future</span>
+            <span>© 2026 Ecova — From Waste to Impact  Built for a Greener Future</span>
             <div style={s.footerBottomRight}>
               <span>DESIGN WITH PURPOSE</span>
               <span>NEUTRAL ORIGIN</span>
@@ -624,7 +595,7 @@ const s = {
   impactImg: { width: '100%', height: '100%', objectFit: 'cover' },
 
   // Footer
-  footer: { backgroundColor: '#111', borderRadius: 20, padding: '40px 48px 24px', color: '#fff' },
+  footer: { backgroundColor: '#182c13', borderRadius: 20, padding: '40px 48px 24px', color: '#fff' },
   footerTop: { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 40, paddingBottom: 32, borderBottom: '1px solid rgba(255,255,255,0.1)' },
   footerBrand: {},
   footerLogo: { fontSize: 20, fontWeight: 700, marginBottom: 14 },

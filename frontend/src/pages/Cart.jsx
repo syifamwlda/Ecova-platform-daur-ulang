@@ -95,25 +95,21 @@ export default function Cart() {
     }
   };
 
-  const handleCheckout = async () => {
-    const selected = cart.filter((i) => i.checked);
-    if (selected.length === 0) {
-      showToast('Pilih minimal 1 produk untuk checkout', 'error');
-      return;
-    }
-    setIsCheckingOut(true);
-    try {
-      await checkout({ items: selected, couponCode: couponApplied ? coupon : null, includeDonation });
-      // Kosongkan cart setelah berhasil
-      localStorage.removeItem('ecoruk_cart');
-      showToast('Pesanan berhasil dibuat!');
-      setTimeout(() => navigate('/pesanan'), 1500);
-    } catch (e) {
-      showToast(e.message || 'Checkout gagal, coba lagi', 'error');
-    } finally {
-      setIsCheckingOut(false);
-    }
-  };
+  const handleCheckout = () => {
+  const selected = cart.filter((i) => i.checked);
+  if (selected.length === 0) {
+    showToast('Pilih minimal 1 produk untuk checkout', 'error');
+    return;
+  }
+  const subtotal = selected.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  navigate('/checkout', {
+    state: {
+      cartItems: selected,
+      total:     subtotal,
+      itemCount: selected.reduce((sum, i) => sum + i.quantity, 0),
+    },
+  });
+};
 
   const totals = calcCartTotals(cart, includeDonation);
   const allChecked = cart.length > 0 && cart.every((i) => i.checked);
