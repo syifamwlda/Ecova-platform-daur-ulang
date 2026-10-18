@@ -1,7 +1,7 @@
 // src/pages/Pembayaran.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatRupiah } from '../services/wasteApi';
+import { formatRupiah } from '../services/wasteAPI';
 import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
 

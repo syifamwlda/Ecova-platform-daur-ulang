@@ -1,7 +1,7 @@
 // src/pages/KonfirmasiPembayaran.jsx
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { formatRupiah } from '../services/wasteApi';
+import { formatRupiah } from '../services/wasteAPI';
 
 // ─── Sidebar (shared) ─────────────────────────────────────────────────────────
 const Sidebar = ({ active }) => {

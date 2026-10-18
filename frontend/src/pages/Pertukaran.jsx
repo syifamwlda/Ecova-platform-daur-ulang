@@ -7,7 +7,7 @@ import {
   exchangeWaste,
   formatRupiah,
   WASTE_TYPE_LABELS,
-} from '../services/wasteApi';
+} from '../services/wasteAPI';
 import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
 
