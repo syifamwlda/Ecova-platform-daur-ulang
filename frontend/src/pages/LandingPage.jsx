@@ -4,296 +4,433 @@ import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import './LandingPage.css'
 
-function FeatureCard({ icon, title, desc, active }) {
-  return (
-    <div className={`feature-card ${active ? 'active' : ''}`}>
-      <div className="feature-icon">{icon}</div>
-      <h3>{title}</h3>
-      <p>{desc}</p>
-    </div>
-  )
-}
-
-function StepCard({ num, title, desc }) {
-  return (
-    <div className="step-card">
-      <div className="step-num">{num}</div>
-      <div className="step-content">
-        <h3>{title}</h3>
-        <p>{desc}</p>
-      </div>
-    </div>
-  )
-}
-
-function ImpactStat({ icon, value, label }) {
-  return (
-    <div className="impact-stat">
-      <span className="impact-icon">{icon}</span>
-      <span className="impact-value">{value}</span>
-      <span className="impact-label">{label}</span>
-    </div>
-  )
-}
-
-const PROYEK_TABS = [
+// Program Menanam Tabs Data
+const PROGRAM_TABS = [
   {
     num: '01',
     tag: 'Tanam Pohon Mu',
     title: 'Sampahmu, Hutan Masa Depan',
     desc: 'Setiap sampah yang kamu kumpulkan berkontribusi langsung pada penanaman pohon di kawasan hutan yang membutuhkan pemulihan ekosistem.',
-    img: 'https://i.pinimg.com/736x/a6/ec/2d/a6ec2dec8497850c7b1c090a9d34a3e8.jpg',
-    pillIcon: '🌱',
-    pillLabel: 'Gabung Gerakan Tanam Pohon Mu',
+    img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=900&q=80',
+    badgeText: 'Setiap 10kg sampah = 1 bibit pohon ditanamkan',
+    badgeTitle: 'Tanam Harapanmu',
+    ctaText: 'Pelajari Program →',
   },
   {
     num: '02',
-    tag: 'Impact Tindakan',
-    title: 'Impact Tindakan',
-    desc: 'Lihat dampak nyata dari setiap aksi daur ulangmu dalam angka dan visualisasi yang mudah dipahami oleh semua orang.',
-    img: 'https://i.pinimg.com/1200x/49/b5/66/49b566ae50cb6ab0ca4106bf54518c4f.jpg',
-    pillIcon: '📊',
-    pillLabel: 'Lihat Dampak Nyatamu',
+    tag: 'Adopsi Pohon',
+    title: 'Adopsi Pohon Mandiri',
+    desc: 'Pantau pertumbuhan pohon adopsimu secara berkala melalui laporan digital berbasis satelit dan GPS yang transparan.',
+    img: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=900&q=80',
+    badgeText: 'GPS & Satelit Monitoring Real-time',
+    badgeTitle: 'Transparansi Penuh',
+    ctaText: 'Lihat Adopsi →',
   },
   {
     num: '03',
-    tag: 'Soil Achievement',
-    title: 'Soil Achievement',
-    desc: 'Raih pencapaian tanah sehat dengan berkontribusi pada program pemulihan lahan kritis di seluruh Indonesia.',
-    img: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=900&q=80',
-    pillIcon: '🌍',
-    pillLabel: 'Pulihkan Lahan Kritis',
+    tag: 'Hutan Komunitas',
+    title: 'Hutan Bersama Komunitas',
+    desc: 'Gotong royong bersama komunitas Ecova menghijaukan kembali pesisir pantai dengan tanaman mangrove penahan abrasi.',
+    img: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=900&q=80',
+    badgeText: '1.200+ Pohon Mangrove Tertanam',
+    badgeTitle: 'Aksi Kolektif',
+    ctaText: 'Ikuti Komunitas →',
   },
   {
     num: '04',
-    tag: 'Eco Impact',
-    title: 'Eco Impact',
-    desc: 'Ukur dampak ekologis totalmu dan bandingkan dengan komunitas lain yang bergabung di platform kami.',
+    tag: 'Dampak Karbon',
+    title: 'Kalkulasi Jejak Karbon',
+    desc: 'Ketahui estimasi reduksi jejak karbon yang telah kamu hasilkan dari setiap kilogram sampah yang berhasil didaur ulang.',
     img: 'https://images.unsplash.com/photo-1500829243541-74b677fecc30?w=900&q=80',
-    pillIcon: '♻️',
-    pillLabel: 'Bandingkan Eco Impact',
+    badgeText: 'Emisi Karbon Tereduksi Hingga 45%',
+    badgeTitle: 'Net Zero Target',
+    ctaText: 'Hitung Karbon →',
   },
 ]
 
 export default function LandingPage() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState(0)
+  const [selectedTag1, setSelectedTag1] = useState('Penghijauan Berkelanjutan')
+  const [selectedTag2, setSelectedTag2] = useState('Daur Ulang Bersih')
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteSuccess, setInviteSuccess] = useState(false)
+
+  const handleInviteSubmit = (e) => {
+    e.preventDefault()
+    if (!inviteEmail) return
+    setInviteSuccess(true)
+    setTimeout(() => {
+      setInviteSuccess(false)
+      setInviteEmail('')
+    }, 4000)
+  }
 
   return (
-    <div className="landing page-enter">
+    <div className="landing-page-root">
+      {/* Navbar */}
       <Navbar />
+
+      {/* Hero + Sub-banner + Metrics */}
       <Hero />
 
+      {/* ── SECTION 1: MEMBANGUN AKSI NYATA (BENTO GRID) ── */}
       <section className="section aksi-section" id="about">
         <div className="container">
-
-          <div className="aksi-header">
-            <div className="section-label">Proyek Dari Kami</div>
-            <h2>Membangun Aksi Nyata Bersama <em>Ecova</em></h2>
-            <p>Yang Guru Menggugah Semangat, Sebarnya Jadi Sesuatu yang Berguna dan Berarti</p>
+          <div className="section-title-center">
+            <span className="section-pill-label">Aksi & Kontribusi</span>
+            <h2 className="section-heading-main">
+              Membangun Aksi Nyata Bersama <em className="accent-green">Ecoruk</em>
+            </h2>
+            <p className="section-subtitle-main">
+              Mulai dari langkah kecil di rumahmu, ciptakan dampak raksasa untuk kelestarian bumi bersama.
+            </p>
           </div>
 
-          {/* Baris atas: foto besar + 2 kartu kanan */}
-          <div className="aksi-top-grid">
-            <div className="aksi-img-wrap">
-              <img src="https://i.pinimg.com/736x/1e/3b/3e/1e3b3e0e0c84b18ff64c212a4a97e0dc.jpg" alt="recycling" />
-            </div>
-            <div className="aksi-cards-col">
-              <div className="aksi-card">
-                <div className="aksi-card-eyebrow">Jadi Diri Sendiri</div>
-                <p>Pilah sampah mulai dari diri sendiri. Hal kecil yang kamu lakukan hari ini berdampak besar untuk masa depan bumi.</p>
-                <button className="aksi-btn" onClick={() => navigate('/login')}>Baca Detail</button>
+          {/* Bento Grid */}
+          <div className="bento-grid">
+            {/* Bento Card 1: Left Tall Community Card */}
+            <div className="bento-card bento-card-tall">
+              <img
+                src="https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?w=800&q=80"
+                alt="Komunitas Daur Ulang"
+                className="bento-bg-img"
+              />
+              <div className="bento-card-overlay">
+                <div className="bento-badge-pill">
+                  <span className="pill-dot"></span>
+                  Komunitas
+                </div>
+                <h3 className="bento-title">Komunitas Peduli: Waste to Worth Hub</h3>
+                <p className="bento-desc">
+                  Wadah kolaborasi pemilah sampah dan pegiat lingkungan di kotamu.
+                </p>
+                <button className="bento-btn-primary" onClick={() => navigate('/login')}>
+                  Bergabung
+                </button>
               </div>
-              <div className="aksi-card">
-                <div className="aksi-card-eyebrow">Jadi Hasil Galeri</div>
-                <p>Wujudkan kreasi dari limbah dengan mengubah sampah menjadi karya seni yang bernilai ekonomi tinggi.</p>
-                <button className="aksi-btn" onClick={() => navigate('/login')}>Baca Detail</button>
+            </div>
+
+            {/* Bento Right Column */}
+            <div className="bento-right-column">
+              {/* Row of 2 Small Cards */}
+              <div className="bento-row-cards">
+                {/* Bento Card 2: White Pilah Mandiri */}
+                <div className="bento-card bento-card-light">
+                  <div className="bento-icon-tag">🌱</div>
+                  <h4 className="bento-small-title">Pilah Dari Diri Sendiri</h4>
+                  <p className="bento-small-desc">
+                    Langkah kecilmu memilah dari rumah adalah awal rantai daur ulang bersih.
+                  </p>
+                  <button className="bento-btn-dark" onClick={() => navigate('/login')}>
+                    Baca Detail
+                  </button>
+                </div>
+
+                {/* Bento Card 3: Lime Green Jemput Sampah */}
+                <div className="bento-card bento-card-lime">
+                  <div className="bento-icon-tag lime-icon">🚚</div>
+                  <h4 className="bento-small-title">Jemput Sampah Mudah</h4>
+                  <p className="bento-small-desc">
+                    Jadwalkan penjemputan gratis langsung di depan pintu rumahmu.
+                  </p>
+                  <button className="bento-btn-white" onClick={() => navigate('/login')}>
+                    Jadwalkan
+                  </button>
+                </div>
+              </div>
+
+              {/* Bento Card 4: Workshop Education Card */}
+              <div className="bento-card bento-card-education">
+                <div className="education-content">
+                  <span className="bento-badge-pill light">Edukasi</span>
+                  <h3 className="bento-title">Sampah Bisa Lebih dari Itu</h3>
+                  <p className="bento-desc">
+                    Pelajari cara mengolah limbah bernilai ekonomis tinggi melalui workshop kami.
+                  </p>
+                  <button className="bento-btn-primary" onClick={() => navigate('/login')}>
+                    Pelajari
+                  </button>
+                </div>
+                <div className="education-media">
+                  <img
+                    src="https://images.unsplash.com/photo-1577495508048-b635879837f1?w=600&q=80"
+                    alt="Edukasi dan Pelatihan"
+                  />
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Baris bawah: 2 kartu lebar */}
-          <div className="aksi-bottom-grid">
-            <div className="aksi-wide-card">
-              <div className="aksi-wide-img">
-                <img src="https://i.pinimg.com/736x/9f/82/56/9f825616a6918b5b8a3638081894f4dc.jpg" alt="komunitas" />
-              </div>
-              <div className="aksi-wide-body">
-                <span className="aksi-eyebrow-tag">Komunitas</span>
-                <h3>Komunitas Ecova Waste to Worth Hub</h3>
-                <p>Forum para penggerak perubahan dan pemilah sampah terbaik. Bergabung dan berbagi pengalaman bersama komunitas kami.</p>
-                <button className="aksi-outline-btn" onClick={() => navigate('/login')}>Bergabung</button>
-              </div>
-            </div>
-            <div className="aksi-wide-card aksi-wide-dark">
-              <div className="aksi-wide-body">
-                <span className="aksi-eyebrow-tag light">Edukasi</span>
-                <h3>Sampah Bisa <em>Lebih dari Itu</em></h3>
-                <p>Pelajari cara mengolah berbagai jenis sampah menjadi produk bernilai tinggi yang dapat dijual dan menambah penghasilan.</p>
-                <button className="aksi-outline-btn light" onClick={() => navigate('/login')}>Bergabung</button>
-              </div>
-              <div className="aksi-wide-img">
-                <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=700&q=80" alt="edukasi" />
-              </div>
-            </div>
-          </div>
-
         </div>
       </section>
 
-      {/* ── PROYEK MENANAM ─────────────────────────────────────────────── */}
+      {/* ── SECTION 2: SELAIN MENGOLAH KAMI JUGA MENANAM POHON (ACCORDION) ── */}
       <section className="section proyek-section" id="proyek">
         <div className="container">
-          <div className="proyek-header">
-            <div className="section-label">Proyek Menanam</div>
-            <h2>Selain Mengolah Kami Juga <em>Menanam Pohon</em></h2>
-            <p>Tata hanya menggugah sampah dari program kami untuk menanam pohon yang menjaga ekosistem kita dan generasi mendatang.</p>
+          <div className="section-title-center">
+            <span className="section-pill-label">Program Hijau</span>
+            <h2 className="section-heading-main">
+              Selain Mengolah Kami Juga <em className="accent-green">Menanam Pohon</em>
+            </h2>
+            <p className="section-subtitle-main">
+              Setiap sampah yang berhasil diolah dikonversi langsung menjadi bibit pohon untuk memulihkan hutan kritis di Indonesia.
+            </p>
           </div>
 
-          <div className="proyek-tabs-wrap">
-            {PROYEK_TABS.map((tab, i) => (
-              <div
-                key={tab.num}
-                className={`proyek-tab ${activeTab === i ? 'proyek-tab-active' : ''}`}
-                onClick={() => setActiveTab(i)}
-              >
-                {activeTab === i ? (
-                  /* ── EXPANDED STATE ── */
-                  <>
-                    <div className="proyek-tab-numrow">
-                      <span className="proyek-tab-num">{tab.num}</span>
-                    </div>
-                    <div className="proyek-tab-inner">
-                      <div className="proyek-tab-img-wrap">
-                        <img src={tab.img} alt={tab.title} />
-                        <div className="proyek-img-pill">
-                          <span className="pill-icon">{tab.pillIcon}</span>
+          {/* Interactive Horizontal Accordion */}
+          <div className="accordion-container">
+            {PROGRAM_TABS.map((tab, idx) => {
+              const isActive = activeTab === idx
+              return (
+                <div
+                  key={tab.num}
+                  className={`accordion-item ${isActive ? 'is-expanded' : 'is-collapsed'}`}
+                  onClick={() => setActiveTab(idx)}
+                >
+                  {isActive ? (
+                    /* EXPANDED VIEW */
+                    <div className="accordion-expanded-view">
+                      <div className="accordion-header-row">
+                        <span className="accordion-num-badge">{tab.num}</span>
+                        <div className="accordion-header-texts">
+                          <h3 className="accordion-title">{tab.title}</h3>
+                          <p className="accordion-desc">{tab.desc}</p>
+                        </div>
+                      </div>
+
+                      <div className="accordion-visual-wrapper">
+                        <img src={tab.img} alt={tab.title} className="accordion-img" />
+                        <div className="accordion-floating-badge">
+                          <div className="accordion-badge-icon">🌿</div>
                           <div>
-                            <strong>{tab.pillLabel}</strong>
-                            <small>Bersama Masa Depan</small>
+                            <strong>{tab.badgeTitle}</strong>
+                            <p>{tab.badgeText}</p>
                           </div>
                         </div>
                       </div>
-                      <div className="proyek-tab-desc">
-                        <span className="proyek-tab-tag">{tab.tag}</span>
-                        <h3>{tab.title}</h3>
-                        <p>{tab.desc}</p>
+
+                      <div className="accordion-footer-row">
                         <button
-                          className="proyek-tab-cta"
-                          onClick={(e) => { e.stopPropagation(); navigate('/login') }}
+                          className="accordion-cta-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate('/login')
+                          }}
                         >
-                          Pelajari Program →
+                          {tab.ctaText}
                         </button>
                       </div>
                     </div>
-                  </>
-                ) : (
-                  /* ── COLLAPSED STATE ── */
-                  <>
-                    <span className="proyek-tab-num collapsed">{tab.num}</span>
-                    <span className="proyek-tab-vert-label">{tab.tag}</span>
-                  </>
+                  ) : (
+                    /* COLLAPSED VIEW */
+                    <div className="accordion-collapsed-view">
+                      <span className="accordion-collapsed-num">{tab.num}</span>
+                      <span className="accordion-collapsed-label">{tab.tag}</span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 3: ALTERNATING STORIES & INTERACTIVE TAGS ── */}
+      <section className="section stories-section" id="features">
+        <div className="container">
+          {/* Story Row 1: Image Left, Content Right */}
+          <div className="story-row">
+            <div className="story-media-wrap">
+              <img
+                src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=700&q=80"
+                alt="Tanam Masa Depan"
+                className="story-img"
+              />
+            </div>
+            <div className="story-content-wrap">
+              <div className="story-icon-box">🌱</div>
+              <h3 className="story-title">Mulai dari Sampah, Tumbuhkan Masa Depan</h3>
+              <p className="story-desc">
+                Dari botol plastik yang kamu kumpulkan hingga pohon rindang yang menaungi bumi, semua berawal dari kepedulian langkah pertamamu hari ini.
+              </p>
+
+              {/* Interactive Tags */}
+              <div className="story-tags-group">
+                {['Penghijauan Berkelanjutan', 'Kontribusi Nyata', 'Bibit Berkualitas'].map((t) => (
+                  <button
+                    key={t}
+                    className={`story-tag-pill ${selectedTag1 === t ? 'active' : ''}`}
+                    onClick={() => setSelectedTag1(t)}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Story Row 2: Content Left, Image Right */}
+          <div className="story-row story-row-reverse">
+            <div className="story-content-wrap">
+              <div className="story-icon-box recycle-icon">♻️</div>
+              <h3 className="story-title">Sampahmu Lebih dari Sekedar Buangan</h3>
+              <p className="story-desc">
+                Setiap material yang terpilah memiliki siklus hidup baru. Dukung pertumbuhan ekonomi sirkular untuk masa depan bumi dan generasi mendatang.
+              </p>
+
+              {/* Interactive Tags */}
+              <div className="story-tags-group">
+                {['Pengolahan Akurat', 'Daur Ulang Bersih', 'Tracking Real-time'].map((t) => (
+                  <button
+                    key={t}
+                    className={`story-tag-pill ${selectedTag2 === t ? 'active' : ''}`}
+                    onClick={() => setSelectedTag2(t)}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="story-media-wrap">
+              <img
+                src="https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=700&q=80"
+                alt="Daur Ulang Bersih"
+                className="story-img"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 4: THREE ACTION PILLARS ── */}
+      <section className="section pillars-section">
+        <div className="container">
+          <div className="pillars-grid">
+            <div className="pillar-card" onClick={() => navigate('/login')}>
+              <div className="pillar-icon-box">♻️</div>
+              <h4 className="pillar-title">Kelola Sampah</h4>
+              <p className="pillar-desc">Pilah dan jadwalkan penjemputan sampahmu dengan cepat langsung dari aplikasi.</p>
+            </div>
+            <div className="pillar-card" onClick={() => navigate('/login')}>
+              <div className="pillar-icon-box">🌳</div>
+              <h4 className="pillar-title">Dampak Hijau</h4>
+              <p className="pillar-desc">Konversi poin daur ulang menjadi bibit pohon untuk gerakan restorasi alam.</p>
+            </div>
+            <div className="pillar-card" onClick={() => navigate('/login')}>
+              <div className="pillar-icon-box">🤝</div>
+              <h4 className="pillar-title">Gerak Bersama</h4>
+              <p className="pillar-desc">Terhubung dengan ribuan relawan dan komunitas peduli lingkungan sekitarmu.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 5: AJAK & TUMBUH BERSAMA (CTA BANNER) ── */}
+      <section className="section cta-banner-section" id="kontak">
+        <div className="container">
+          <div className="cta-banner-card">
+            <div className="cta-banner-media">
+              <img
+                src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&q=80"
+                alt="Bergabung Bersama"
+                className="cta-circle-img"
+              />
+            </div>
+            <div className="cta-banner-content">
+              <h2 className="cta-heading">
+                Ajak & Tumbuh <em className="accent-italic">Bersama</em>
+              </h2>
+              <p className="cta-desc">
+                Ajak teman dan keluargamu bergerak bersama Ecova. Raih bonus saldo dan poin reward untuk setiap aksi daur ulang pertamamu!
+              </p>
+
+              <form onSubmit={handleInviteSubmit} className="cta-form">
+                <div className="cta-input-wrapper">
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="Tuliskan Email Kamu..."
+                    className="cta-email-input"
+                    required
+                  />
+                  <button type="submit" className="cta-submit-btn">
+                    Mulai Sekarang
+                  </button>
+                </div>
+                {inviteSuccess && (
+                  <div className="cta-success-toast">
+                    🎉 Terima kasih! Tautan pendaftaran telah dikirim ke email kamu.
+                  </div>
                 )}
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="footer-dark">
+        <div className="container">
+          <div className="footer-main-grid">
+            {/* Col 1: Brand Info */}
+            <div className="footer-brand-col">
+              <div className="footer-brand-logo">
+                <span className="brand-dot">♻</span>
+                <span className="brand-title">Ecova</span>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ───────────────────────────────────────────────────── */}
-      <section className="section features-section" id="features">
-        <div className="container">
-          <div className="section-header">
-            <div className="section-label">Fitur Unggulan</div>
-            <h2>Solusi Lengkap Untuk Pengelolaan Sampahmu</h2>
-            <p>Teknologi canggih yang memudahkan setiap langkah proses daur ulang</p>
-          </div>
-          <div className="features-grid">
-            <FeatureCard icon="📦" title="Penjemputan Mudah"    desc="Jadwalkan penjemputan sampah dari rumah dengan mudah melalui aplikasi. Kurir kami siap datang sesuai waktu yang kamu pilih." />
-            <FeatureCard icon="💰" title="Dapatkan Penghasilan" desc="Tukarkan sampah daur ulangmu dengan poin dan uang tunai. Semakin banyak daur ulang, semakin banyak penghasilan." active />
-            <FeatureCard icon="📊" title="Lacak Dampakmu"       desc="Pantau kontribusi lingkunganmu secara real-time. Lihat berapa banyak CO₂ yang berhasil kamu kurangi." />
-            <FeatureCard icon="🤝" title="Komunitas Hijau"      desc="Bergabung dengan komunitas peduli lingkungan. Ikuti tantangan, raih badge, dan bersaing di leaderboard." />
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ───────────────────────────────────────────────── */}
-      <section className="section how-section" id="how">
-        <div className="container">
-          <div className="section-header">
-            <div className="section-label">Cara Kerja</div>
-            <h2>Mulai Daur Ulang dalam 3 Langkah</h2>
-          </div>
-          <div className="steps-grid">
-            <StepCard num="01" title="Daftar & Verifikasi" desc="Buat akun gratis, verifikasi email, dan lengkapi profil kamu dalam 2 menit." />
-            <StepCard num="02" title="Pilah Sampahmu"      desc="Pisahkan sampah berdasarkan kategori: organik, plastik, kertas, dan logam." />
-            <StepCard num="03" title="Jemput & Tukar"      desc="Jadwalkan penjemputan dan tukarkan sampahmu dengan poin atau uang tunai." />
-          </div>
-        </div>
-      </section>
-
-      {/* ── IMPACT ─────────────────────────────────────────────────────── */}
-      <section className="section impact-section" id="impact">
-        <div className="container">
-          <div className="impact-inner">
-            <div className="impact-text">
-              <div className="section-label light">Dampak Nyata</div>
-              <h2>Bersama Kita Ubah Dunia</h2>
-              <p>Setiap kilogram sampah yang kamu daur ulang berkontribusi pada masa depan yang lebih hijau.</p>
-              <button className="btn-primary-green" onClick={() => navigate('/login')}>Mulai Berkontribusi</button>
-            </div>
-            <div className="impact-stats-grid">
-              <ImpactStat icon="♻️" value="10.4K" label="Ton Sampah Didaur Ulang" />
-              <ImpactStat icon="🌳" value="52K+"  label="Pohon Setara CO₂ Diselamatkan" />
-              <ImpactStat icon="💧" value="8.2M"  label="Liter Air Dihemat" />
-              <ImpactStat icon="👥" value="120K+" label="Anggota Aktif" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ────────────────────────────────────────────────────────── */}
-      <section className="cta-section">
-        <div className="container">
-          <div className="cta-inner">
-            <div className="cta-text">
-              <h2>Ajak & Tumbuh Bersama</h2>
-              <p>Undang teman dan dapatkan bonus poin untuk setiap anggota baru yang bergabung</p>
-            </div>
-            <div className="cta-actions">
-              <input type="email" placeholder="Masukkan email temanmu..." className="cta-input" />
-              <button className="cta-btn" onClick={() => navigate('/login')}>Undang Sekarang</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FOOTER ─────────────────────────────────────────────────────── */}
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-grid">
-            <div className="footer-brand">
-              <div className="footer-logo"><span>♻</span><span>Ecova</span></div>
-              <p>Platform daur ulang cerdas untuk Indonesia yang lebih hijau.</p>
-              <div className="footer-socials">
-                {['📘','📸','🐦','▶️'].map((s,i) => <span key={i} className="social-icon">{s}</span>)}
+              <p className="footer-brand-desc">
+                Platform daur ulang berbasis web dengan sistem reward, eco marketplace, dan kontribusi nyata untuk kelestarian lingkungan.
+              </p>
+              <div className="footer-social-links">
+                <a href="#twitter" aria-label="X">𝕏</a>
+                <a href="#instagram" aria-label="Instagram">📸</a>
+                <a href="#github" aria-label="GitHub">🐙</a>
+                <a href="#linkedin" aria-label="LinkedIn">💼</a>
               </div>
             </div>
-            <div className="footer-col">
+
+            {/* Col 2: Platform */}
+            <div className="footer-nav-col">
               <h4>Platform</h4>
-              <ul><li>Cara Kerja</li><li>Harga Sampah</li><li>Jadwal Jemput</li><li>Komunitas</li></ul>
+              <ul>
+                <li><a href="#hero">Beranda</a></li>
+                <li><a href="#about">Tentang Kami</a></li>
+                <li><a href="#proyek">Program Hijau</a></li>
+                <li><a href="#features">Aksi Nyata</a></li>
+              </ul>
             </div>
-            <div className="footer-col">
-              <h4>Perusahaan</h4>
-              <ul><li>Tentang Kami</li><li>Karier</li><li>Blog</li><li>Press</li></ul>
+
+            {/* Col 3: Layanan */}
+            <div className="footer-nav-col">
+              <h4>Layanan</h4>
+              <ul>
+                <li><a href="#" onClick={() => navigate('/login')}>Jemput Sampah</a></li>
+                <li><a href="#" onClick={() => navigate('/login')}>Eco Marketplace</a></li>
+                <li><a href="#" onClick={() => navigate('/login')}>Tukar Saldo DANA</a></li>
+                <li><a href="#" onClick={() => navigate('/login')}>Adopsi Pohon</a></li>
+              </ul>
             </div>
-            <div className="footer-col">
-              <h4>Dukungan</h4>
-              <ul><li>Pusat Bantuan</li><li>Kebijakan Privasi</li><li>Syarat & Ketentuan</li><li>Kontak</li></ul>
+
+            {/* Col 4: Kontak & Legal */}
+            <div className="footer-nav-col">
+              <h4>Bantuan</h4>
+              <ul>
+                <li><a href="#kontak">Hubungi Kami</a></li>
+                <li><a href="#">Pusat Bantuan</a></li>
+                <li><a href="#">Kebijakan Privasi</a></li>
+                <li><a href="#">Syarat & Ketentuan</a></li>
+              </ul>
             </div>
           </div>
-          <div className="footer-bottom">
-            <p>© 2025 Ecovan. Dibuat dengan 💚 untuk bumi yang lebih baik.</p>
+
+          <div className="footer-bottom-bar">
+            <p>© 2026 Ecova — Platform Daur Ulang & Eco Marketplace. Hak Cipta Dilindungi.</p>
+            <div className="footer-legal-links">
+              <a href="#">Kebijakan Privasi</a>
+              <span className="dot-divider">•</span>
+              <a href="#">Syarat Penggunaan</a>
+            </div>
           </div>
         </div>
       </footer>
