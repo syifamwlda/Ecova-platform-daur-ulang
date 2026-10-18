@@ -1,66 +1,85 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🌿 ECOVA Backend API (Laravel 10)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Layanan RESTful API untuk platform **ECOVA (Eco Value & Recycling)** dibangun dengan **Laravel 10** dan **Laravel Sanctum**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Panduan Setup Backend
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Prasyarat
+- PHP >= 8.1
+- Composer
+- Ekstensi PHP yang dibutuhkan: `pdo`, `pdo_mysql` (atau `pdo_sqlite`), `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. Instalasi Dependensi
+```bash
+composer install
+```
 
-## Learning Laravel
+### 3. Konfigurasi Environment
+Salin file konfigurasi:
+```bash
+cp .env.example .env
+# Windows CMD: copy .env.example .env
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Generate application key:
+```bash
+php artisan key:generate
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Sesuaikan koneksi database di file `.env`:
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ecova_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+*(Atau gunakan `DB_CONNECTION=sqlite` dan buat file `database/database.sqlite`)*
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 4. Migrasi & Seeding Data Awal
+Jalankan migrasi tabel beserta seeder akun demo dan data statistik:
+```bash
+php artisan migrate --seed
+```
 
-## Laravel Sponsors
+> **Akun Demo Bawaan:**
+> - Email: `demo@ecoruk.id`
+> - Password: `password123`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### 5. Jalankan Local Server
+```bash
+php artisan serve
+```
+Server API akan aktif di `http://localhost:8000/api`.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## 📡 Daftar Endpoint API
 
-## Contributing
+### 1. Autentikasi (`/api`)
+- `POST /api/register` – Registrasi user baru
+- `POST /api/login` – Login & mendapatkan Bearer Token
+- `POST /api/logout` – Logout & revoke token (Sanctum)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 2. Dashboard (`/api/dashboard`)
+- `GET /api/dashboard` – Agregasi statistik dampak lingkungan, histori sampah, dan target bulanan (Sanctum)
 
-## Code of Conduct
+### 3. Manajemen Sampah / Pertukaran (`/api/wastes`)
+- `POST /api/wastes/scan` – Input / scan sampah baru (Sanctum)
+- `GET /api/wastes/current` – Ambil daftar sampah pending/verified milik user (Sanctum)
+- `POST /api/wastes/exchange` – Tukar sampah aktif menjadi saldo (Sanctum)
+- `GET /api/wastes/history` – Riwayat seluruh sampah user (Sanctum)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Marketplace & Produk (`/api/products`)
+- `GET /api/products` – Daftar produk daur ulang (Mendukung filter category, search, pagination)
+- `GET /api/products/{id}` – Detail produk berdasarkan ID
 
-## Security Vulnerabilities
+### 5. Pesanan / Checkout (`/api/orders`)
+- `POST /api/orders` – Membuat pesanan produk daur ulang + opsi donasi pohon (Sanctum)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 6. Pembayaran / Penarikan Saldo (`/api/payments`)
+- `POST /api/payments` – Pengajuan penarikan saldo reward (DANA, Transfer Bank, dll.) (Sanctum)
+- `GET /api/payments` – Riwayat transaksi penarikan saldo (Sanctum)
