@@ -337,6 +337,41 @@
   margin-top: 2px;
 }
 
+/* Demo Account Hint Box */
+.demo-hint-box {
+  background: #EAF3E9;
+  border: 1px dashed rgba(46, 125, 50, 0.35);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.demo-hint-box:hover {
+  background: #DFECDE;
+  border-color: #2E7D32;
+  transform: translateY(-1px);
+}
+
+.demo-hint-badge {
+  background: #2E7D32;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.demo-hint-text {
+  font-size: 11px;
+  color: #123620;
+  font-weight: 500;
+}
+
 /* Remember Me & Forgot Password */
 .form-options-row {
   display: flex;

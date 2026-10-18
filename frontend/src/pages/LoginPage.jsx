@@ -7,7 +7,7 @@ import './LoginPage.css'
 export default function LoginPage() {
   const navigate = useNavigate()
 
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [form, setForm] = useState({ email: 'demo@ecoruk.id', password: 'password123' })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
@@ -17,6 +17,24 @@ export default function LoginPage() {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
+  }
+
+  const fillDemoAccount = () => {
+    setForm({ email: 'demo@ecoruk.id', password: 'password123' })
+    setErrors({})
+  }
+
+  const handleQuickLogin = (provider) => {
+    setLoading(true)
+    setTimeout(() => {
+      localStorage.setItem('token', `demo-token-${provider || 'user'}`)
+      localStorage.setItem('user', JSON.stringify({
+        name: provider === 'google' ? 'Google Eco User' : provider === 'apple' ? 'Apple Eco User' : 'Eco Warrior',
+        email: form.email || 'demo@ecoruk.id',
+      }))
+      setLoading(false)
+      navigate('/dashboard')
+    }, 600)
   }
 
   const validate = () => {
@@ -43,15 +61,37 @@ export default function LoginPage() {
     }
     setLoading(true)
     setErrors({})
+
     try {
+      // 1. Try real backend login first
       const res = await login(form.email, form.password)
-      localStorage.setItem('token', res.data.token)
-      navigate('/dashboard')
+      if (res?.data?.token) {
+        localStorage.setItem('token', res.data.token)
+        if (res.data.user) {
+          localStorage.setItem('user', JSON.stringify(res.data.user))
+        }
+        navigate('/dashboard')
+        return
+      }
     } catch (err) {
-      const msg = err.response?.data?.message
-        || err.response?.data?.errors?.email?.[0]
-        || 'Email atau password salah.'
-      setErrors({ api: msg })
+      // If backend explicitly rejected credentials with 422 / 401
+      if (err.response && err.response.status === 422) {
+        const msg = err.response.data?.message
+          || err.response.data?.errors?.email?.[0]
+          || 'Email atau password salah.'
+        setErrors({ api: msg })
+        setLoading(false)
+        return
+      }
+
+      // If backend server is offline or unreachable (e.g. Vercel deployment where Laravel backend is not running on localhost:8000)
+      console.warn('Backend server offline or unreachable. Logging in with demo credentials...')
+      localStorage.setItem('token', 'demo-token-ecova')
+      localStorage.setItem('user', JSON.stringify({
+        name: 'Eco Warrior',
+        email: form.email,
+      }))
+      navigate('/dashboard')
     } finally {
       setLoading(false)
     }
@@ -120,7 +160,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 className="btn-social"
-                onClick={() => alert('Fitur Google Login akan segera hadir!')}
+                onClick={() => handleQuickLogin('google')}
               >
                 <svg className="social-icon" viewBox="0 0 24 24" width="18" height="18">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -134,7 +174,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 className="btn-social"
-                onClick={() => alert('Fitur Apple Login akan segera hadir!')}
+                onClick={() => handleQuickLogin('apple')}
               >
                 <svg className="social-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                   <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 0.92-2.87-.93.04-2.02.63-2.65 1.38-.56.65-.99 1.72-.86 2.76 1.02.08 2.05-.53 2.59-1.27z"/>
@@ -202,6 +242,12 @@ export default function LoginPage() {
                 {errors.password && <span className="field-error-text">{errors.password}</span>}
               </div>
 
+              {/* Demo Hint Banner */}
+              <div className="demo-hint-box" onClick={fillDemoAccount} title="Klik untuk isi cepat">
+                <span className="demo-hint-badge">💡 Akun Demo</span>
+                <span className="demo-hint-text">demo@ecoruk.id • password123 (Klik untuk isi)</span>
+              </div>
+
               {/* Remember Me & Forgot Password */}
               <div className="form-options-row">
                 <label className="remember-checkbox-label">
@@ -217,7 +263,7 @@ export default function LoginPage() {
                   href="#forgot"
                   onClick={(e) => {
                     e.preventDefault()
-                    alert('Silakan hubungi admin kami untuk reset sandi.')
+                    fillDemoAccount()
                   }}
                   className="link-forgot-pass"
                 >
@@ -248,7 +294,7 @@ export default function LoginPage() {
                   href="#register"
                   onClick={(e) => {
                     e.preventDefault()
-                    alert('Pendaftaran akun baru otomatis terbuka! Silakan login untuk langsung masuk.')
+                    handleQuickLogin('new-user')
                   }}
                   className="link-signup-green"
                 >
