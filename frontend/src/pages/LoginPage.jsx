@@ -11,22 +11,12 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
-  const [pwStrength, setPwStrength] = useState(0)
-  const [focused, setFocused] = useState('')
+  const [rememberMe, setRememberMe] = useState(true)
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
-    if (name === 'password') {
-      let score = 0
-      if (value.length >= 6) score++
-      if (value.length >= 10) score++
-      if (/[A-Z]/.test(value)) score++
-      if (/[0-9]/.test(value)) score++
-      if (/[^A-Za-z0-9]/.test(value)) score++
-      setPwStrength(value.length === 0 ? 0 : score)
-    }
   }
 
   const validate = () => {
@@ -67,194 +57,206 @@ export default function LoginPage() {
     }
   }
 
-  const strengthLabels = ['', 'Lemah', 'Kurang', 'Cukup', 'Kuat', 'Sangat Kuat']
-  const strengthColors = ['', '#e05555', '#e07c55', '#e0b255', '#7ab839', '#2d6b46']
-
   return (
-    <div className="login-page page-enter">
+    <div className="login-root">
       <Navbar />
 
-      {/* Left panel */}
-      <div className="login-panel">
-        <div className="panel-overlay" />
-        <img
-          src="https://images.openai.com/static-rsc-4/HrlSAfeXZ7qCC7l1tz7MOL9z9lgdSPd1Dg8S5qCNRk3kykHtb5ZxwtJGwVYM1btZyWbBfalINLaxeoL4rzqzFXotXw1TLPSNY30ndSVMVemfpxFsebwacRvbV0PA9VBpFZKsH-PihyEbzElgljSA_f6Ojjp_3XOCbWHV5bhHU_y0_3ck2ANTRZjgijtSMoh6?purpose=fullsize"
-          alt="eco background"
-          className="panel-img"
-        />
-        <div className="panel-blob panel-blob--1" />
-        <div className="panel-blob panel-blob--2" />
-        <div className="panel-content">
-          <div className="panel-logo">
-            <div className="panel-logo-icon">♻</div>
-            <span>Ecova</span>
-          </div>
+      <div className="login-split-container">
+        {/* ── LEFT HERO PANEL: GREEN FIELD WITH IMPACT ── */}
+        <div className="login-left-banner">
+          <div className="banner-bg-overlay" />
+          <img
+            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80"
+            alt="Membangun Masa Depan Tanpa Sampah"
+            className="banner-field-img"
+          />
 
-          <div className="panel-quote-card">
-            <div className="panel-quote-bar" />
-            <blockquote className="panel-quote">
-              "Setiap tindakan kecilmu hari ini adalah investasi terbesar untuk bumi anak cucumu."
-            </blockquote>
-          </div>
+          <div className="banner-content-inner">
+            <h1 className="banner-heading">
+              Membangun Masa<br />
+              Depan <span className="banner-highlight">Tanpa Sampah.</span>
+            </h1>
 
-          <div className="panel-stats">
-            <div className="panel-stat">
-              <strong>10K+</strong>
-              <span>Ton Didaur Ulang</span>
-            </div>
-            <div className="panel-stat">
-              <strong>120K</strong>
-              <span>Anggota Aktif</span>
-            </div>
-            <div className="panel-stat">
-              <strong>98%</strong>
-              <span>Kepuasan User</span>
-            </div>
-          </div>
+            <p className="banner-description">
+              Bergabunglah dengan Ecova. Catat sampahmu, ubah jadi produk bernilai, dan temukan produk-produk pilihan dari pasar sirkular yang dihasilkan oleh para pengolah lokal.
+            </p>
 
-          <div className="panel-trust">
-            <span className="panel-trust-dot" />
-            <span>Platform daur ulang terpercaya sejak 2020</span>
+            {/* Floating Glassmorphism Badges */}
+            <div className="banner-badges-row">
+              <div className="glass-stat-badge">
+                <div className="stat-icon-wrapper">♻️</div>
+                <div className="stat-text-box">
+                  <span className="stat-title">Mencegah</span>
+                  <strong className="stat-number">1,2 juta ton sampah</strong>
+                </div>
+              </div>
+
+              <div className="glass-stat-badge">
+                <div className="stat-icon-wrapper">👥</div>
+                <div className="stat-text-box">
+                  <span className="stat-title">Pengguna</span>
+                  <strong className="stat-number">100 ribu+ pengguna</strong>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Right panel - form */}
-      <div className="login-form-side">
-        <div className="login-form-wrap">
-          <button className="back-btn" onClick={() => navigate('/')}>
-            <span className="back-btn-arrow">←</span>
-            Kembali ke Beranda
-          </button>
+        {/* ── RIGHT PANEL: CLEAN MODERN LOGIN FORM ── */}
+        <div className="login-right-form-panel">
+          {/* Decorative floating leaves */}
+          <div className="leaf-decor leaf-1">🍃</div>
+          <div className="leaf-decor leaf-2">🌿</div>
+          <div className="leaf-decor leaf-3">🌱</div>
 
-          <div className="login-header">
-            <h1>Selamat Datang <span className="wave">👋</span></h1>
-            <p>Masuk untuk mulai berkontribusi bagi lingkungan</p>
-          </div>
-
-          {errors.api && (
-            <div className="api-error">
-              <span className="api-error-icon">⚠</span>
-              {errors.api}
-            </div>
-          )}
-
-          <form className="login-form" onSubmit={handleSubmit} noValidate>
-            {/* Email */}
-            <div className={`form-group ${errors.email ? 'has-error' : ''} ${focused === 'email' ? 'is-focused' : ''} ${form.email ? 'is-filled' : ''}`}>
-              <label htmlFor="email">Email</label>
-              <div className="input-wrap">
-                <span className="input-icon">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.4">
-                    <rect x="1" y="2.5" width="13" height="10" rx="2" />
-                    <path d="M1 5l6.5 4.5L14 5" />
-                  </svg>
-                </span>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  onFocus={() => setFocused('email')}
-                  onBlur={() => setFocused('')}
-                  placeholder="email@contoh.com"
-                  autoComplete="email"
-                />
-              </div>
-              {errors.email && <span className="error-msg">⚠ {errors.email}</span>}
+          <div className="login-form-card">
+            <div className="form-header">
+              <h2 className="form-main-title">Selamat Datang Kembali!</h2>
+              <p className="form-subtitle">Terus berkontribusi untuk bumi yang lebih hijau.</p>
             </div>
 
-            {/* Password */}
-            <div className={`form-group ${errors.password ? 'has-error' : ''} ${focused === 'password' ? 'is-focused' : ''} ${form.password ? 'is-filled' : ''}`}>
-              <label htmlFor="password">Password</label>
-              <div className="input-wrap">
-                <span className="input-icon">
-                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.4">
-                    <rect x="2" y="7" width="11" height="7" rx="2" />
-                    <path d="M5 7V5a2.5 2.5 0 015 0v2" />
-                  </svg>
-                </span>
-                <input
-                  type={showPass ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  onFocus={() => setFocused('password')}
-                  onBlur={() => setFocused('')}
-                  placeholder="Masukkan password..."
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  className="toggle-pass"
-                  onClick={() => setShowPass(!showPass)}
-                  tabIndex={-1}
-                >
-                  {showPass ? '🙈' : '👁'}
-                </button>
-              </div>
+            {/* Social Login Buttons */}
+            <div className="social-login-grid">
+              <button
+                type="button"
+                className="btn-social"
+                onClick={() => alert('Fitur Google Login akan segera hadir!')}
+              >
+                <svg className="social-icon" viewBox="0 0 24 24" width="18" height="18">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                </svg>
+                Google
+              </button>
 
-              {/* Strength bar */}
-              {form.password && (
-                <div className="strength-wrap">
-                  <div className="strength-bars">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div
-                        key={i}
-                        className="strength-segment"
-                        style={{ background: i <= pwStrength ? strengthColors[pwStrength] : undefined }}
-                      />
-                    ))}
-                  </div>
-                  <span className="strength-label" style={{ color: strengthColors[pwStrength] }}>
-                    {strengthLabels[pwStrength]}
-                  </span>
+              <button
+                type="button"
+                className="btn-social"
+                onClick={() => alert('Fitur Apple Login akan segera hadir!')}
+              >
+                <svg className="social-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 0.92-2.87-.93.04-2.02.63-2.65 1.38-.56.65-.99 1.72-.86 2.76 1.02.08 2.05-.53 2.59-1.27z"/>
+                </svg>
+                Apple
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="form-divider-line">
+              <span>ATAU DENGAN EMAIL</span>
+            </div>
+
+            {/* Login Form */}
+            <form onSubmit={handleSubmit} className="actual-form">
+              {errors.api && (
+                <div className="form-api-alert">
+                  <span className="alert-icon">⚠️</span>
+                  <span>{errors.api}</span>
                 </div>
               )}
 
-              {errors.password && <span className="error-msg">⚠ {errors.password}</span>}
-            </div>
+              {/* Email Input */}
+              <div className="input-field-group">
+                <label className="field-label">ALAMAT EMAIL</label>
+                <div className={`input-box-wrapper ${errors.email ? 'has-error' : ''}`}>
+                  <span className="field-icon">✉️</span>
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="Masukkan Email Anda"
+                    className="styled-input"
+                    autoComplete="email"
+                  />
+                </div>
+                {errors.email && <span className="field-error-text">{errors.email}</span>}
+              </div>
 
-            <div className="form-extras">
-              <label className="remember-label">
-                <input type="checkbox" />
-                <span>Ingat saya</span>
-              </label>
-              <a href="#" className="forgot-link">Lupa password?</a>
-            </div>
+              {/* Password Input */}
+              <div className="input-field-group">
+                <label className="field-label">KATA SANDI</label>
+                <div className={`input-box-wrapper ${errors.password ? 'has-error' : ''}`}>
+                  <span className="field-icon">🔒</span>
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    placeholder="Masukkan Kata Sandi Anda"
+                    className="styled-input"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    className="btn-toggle-eye"
+                    onClick={() => setShowPass(!showPass)}
+                    tabIndex="-1"
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPass ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
+                {errors.password && <span className="field-error-text">{errors.password}</span>}
+              </div>
 
-            <button type="submit" className={`submit-btn ${loading ? 'is-loading' : ''}`} disabled={loading}>
-              {loading ? (
-                <span className="btn-loading">
-                  <span className="spinner" />
-                  Memproses...
-                </span>
-              ) : (
-                <span className="btn-text">
-                  Masuk Sekarang
-                  <span className="btn-arrow">→</span>
-                </span>
-              )}
-            </button>
-          </form>
+              {/* Remember Me & Forgot Password */}
+              <div className="form-options-row">
+                <label className="remember-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="styled-checkbox"
+                  />
+                  <span>Ingat Saya</span>
+                </label>
+                <a
+                  href="#forgot"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    alert('Silakan hubungi admin kami untuk reset sandi.')
+                  }}
+                  className="link-forgot-pass"
+                >
+                  Lupa Sandi?
+                </a>
+              </div>
 
-          <div className="divider"><span>atau masuk dengan</span></div>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className={`btn-submit-login ${loading ? 'loading' : ''}`}
+              >
+                {loading ? (
+                  <span className="loading-spinner-wrap">
+                    <span className="spinner"></span>
+                    Memproses...
+                  </span>
+                ) : (
+                  'Masuk'
+                )}
+              </button>
 
-          <div className="social-login">
-            <button className="social-btn">
-              <span className="g-circle">G</span>
-              Masuk dengan Google
-            </button>
+              {/* Sign Up Link */}
+              <div className="form-footer-register">
+                <span>Belum memiliki akun?</span>{' '}
+                <a
+                  href="#register"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    alert('Pendaftaran akun baru otomatis terbuka! Silakan login untuk langsung masuk.')
+                  }}
+                  className="link-signup-green"
+                >
+                  Sign Up
+                </a>
+              </div>
+            </form>
           </div>
-
-          <p className="register-prompt">
-            Belum punya akun?{' '}
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>
-              Daftar gratis
-            </a>
-          </p>
         </div>
       </div>
     </div>

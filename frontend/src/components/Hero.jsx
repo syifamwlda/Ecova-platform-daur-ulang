@@ -50,33 +50,14 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right Column: Visual with Floating Badges */}
+          {/* Right Column: Visual with Exact Mockup Graphic */}
           <div className="hero-visual-container">
-            <div className="hero-art-card">
-              {/* Main Visual Image */}
+            <div className="hero-exact-visual-wrapper">
               <img
-                src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&q=80"
+                src="/assets/hero-visual.png"
                 alt="Ecova Recycling Visual"
-                className="hero-main-img"
+                className="hero-exact-img"
               />
-
-              {/* Floating Badge 1 - Top Left */}
-              <div className="floating-badge badge-top-left">
-                <div className="badge-icon-box">🎁</div>
-                <div className="badge-text-box">
-                  <strong>Kompensasi dan reward</strong>
-                  <p>Sampah dikonversi menjadi saldo & poin</p>
-                </div>
-              </div>
-
-              {/* Floating Badge 2 - Bottom Right */}
-              <div className="floating-badge badge-bottom-right">
-                <div className="badge-icon-box">⚡</div>
-                <div className="badge-text-box">
-                  <strong>Daur Ulang Lebih Cepat</strong>
-                  <p>Jemput langsung ke rumahmu oleh tim mitra</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>

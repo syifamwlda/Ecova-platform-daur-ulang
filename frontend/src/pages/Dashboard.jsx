@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchDashboard } from '../services/api';
 import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
@@ -6,27 +6,27 @@ import Footer from '../components/Footer';
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale, BarElement, LineElement,
-  PointElement, RadialLinearScale, ArcElement,
+  PointElement, ArcElement,
   Title, Tooltip, Legend, Filler,
 } from 'chart.js';
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import './Dashboard.css';
 
 ChartJS.register(
   CategoryScale, LinearScale, BarElement, LineElement,
-  PointElement, RadialLinearScale, ArcElement,
+  PointElement, ArcElement,
   Title, Tooltip, Legend, Filler
 );
 
-// ── Static constants ──────────────────────────────────────────────────────────
+// ── Static constants & Mock data ──────────────────────────────────────────────
 const LOCAL_ROOTS_TOTAL = 126700;
 const TREE_TARGET = 16;
 
 const BADGES = [
-  { id: 1, name: 'Pelopor Ekologi',    desc: 'Bergabung sejak fase Alpha',              icon: '🌱', unlocked: true  },
-  { id: 2, name: 'Penetral Karbon',    desc: 'Mengurangi lebih dari 1 ton CO₂',          icon: '✅', unlocked: true  },
-  { id: 3, name: 'Maestro Marketplace',desc: 'Penjualan barang terlaris pertama berhasil',icon: '🛍', unlocked: true  },
-  { id: 4, name: 'Penjaga Hutan',      desc: 'Tanam total 20 pohon',                     icon: '🔒', unlocked: false },
+  { id: 1, name: 'Pelopor Ekologi',     desc: 'Bergabung sejak fase Alpha',               icon: '🏛️', unlocked: true  },
+  { id: 2, name: 'Penetral Karbon',     desc: 'Mengurangi lebih dari 1 ton CO₂',           icon: '🛡️', unlocked: true  },
+  { id: 3, name: 'Maestro Marketplace', desc: 'Penjualan barang terlaris pertama berhasil', icon: '🛍️', unlocked: true  },
+  { id: 4, name: 'Penjaga Hutan',       desc: 'Tanam total 20 pohon',                      icon: '🔒', unlocked: false },
 ];
 
 const PLANTING_PACKAGES = [
@@ -35,84 +35,41 @@ const PLANTING_PACKAGES = [
   { label: '7 Pohon', price: 'Rp 60.000' },
 ];
 
-// ── Indonesia 2020–2025 waste data (SIPSN KLHK) ───────────────────────────────
-const WASTE_YEARS   = ['2020', '2021', '2022', '2023', '2024', '2025'];
-const WASTE_TOTAL   = [17.93, 29.44, 35.93, 41.0,  34.2,  25.14];
-const WASTE_MANAGED = [11.7,  18.2,  22.45, 25.0,  20.7,  15.3 ];
-const WASTE_PLASTIC = [2.85,  4.68,  6.45,  7.38,  6.72,  5.15 ];
-
-const WASTE_COMP_2025 = [
-  { label: 'Sisa Makanan', pct: 40.76, color: '#2d7a4f' },
-  { label: 'Plastik',      pct: 20.49, color: '#4a9e6b' },
-  { label: 'Kayu/Ranting', pct: 13.29, color: '#6dba8b' },
-  { label: 'Kertas/Karton',pct: 11.25, color: '#8fcfa8' },
-  { label: 'Logam',        pct:  3.05, color: '#b0d8be' },
-  { label: 'Lainnya',      pct: 11.16, color: '#d1e8d9' },
+// ── Indonesia 2020–2026 Waste Clustered Bar Data ──────────────────────────────
+const YEARS = ['2020', '2021', '2022', '2023', '2024', '2025', '2026'];
+const YEAR_COLORS = [
+  '#C0E8C8',
+  '#A8DCB4',
+  '#86CA97',
+  '#5FB576',
+  '#3E9958',
+  '#277F42',
+  '#165A2C',
 ];
 
-const YEAR_COLORS = ['#c0e0cc','#9fd4b4','#6dba8b','#4a9e6b','#2d7a4f','#1a5c34'];
-
-const CHART_TOOLTIP_OPTS = {
-  backgroundColor: '#1a3c2a',
-  titleFont: { family: "'DM Sans', sans-serif", size: 11 },
-  bodyFont:  { family: "'DM Sans', sans-serif", size: 11 },
-  padding: 10,
-  cornerRadius: 8,
+// Values for [Total Timbulan, Total Terkelola] per year
+const YEAR_VALUES = {
+  '2020': [17.9, 11.7],
+  '2021': [22.4, 14.5],
+  '2022': [29.4, 18.2],
+  '2023': [25.0, 16.1],
+  '2024': [24.2, 16.5],
+  '2025': [22.1, 15.3],
+  '2026': [27.5, 17.8], // Projected
 };
 
-// ── IndonesiaWasteChart ───────────────────────────────────────────────────────
-function IndonesiaWasteChart() {
-  const [chartType, setChartType] = useState('bar');   // 'bar' | 'line' | 'multi'
-  const [activeMetric, setActiveMetric] = useState('total');
-
-  const metricMap = {
-    total:   { data: WASTE_TOTAL,   color: '#2d7a4f', label: 'Total timbulan (jt ton)' },
-    managed: { data: WASTE_MANAGED, color: '#4a9e6b', label: 'Terkelola (jt ton)'      },
-    plastic: { data: WASTE_PLASTIC, color: '#1a5c34', label: 'Sampah plastik (jt ton)' },
-  };
-
-  const buildSingleDataset = () => {
-    const m = metricMap[activeMetric];
-    if (chartType === 'bar') {
-      return {
-        type: 'bar',
-        label: m.label,
-        data: m.data,
-        backgroundColor: YEAR_COLORS,
-        borderRadius: 6,
-        borderSkipped: false,
-      };
-    }
-    return {
-      type: 'line',
-      label: m.label,
-      data: m.data,
-      borderColor: m.color,
-      backgroundColor: m.color + '22',
-      borderWidth: 2.5,
-      pointRadius: 5,
-      pointBackgroundColor: YEAR_COLORS,
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      tension: 0.4,
-      fill: true,
-    };
-  };
-
-  const multiDatasets = [
-    { type: 'bar',  label: 'Total timbulan', data: WASTE_TOTAL,   backgroundColor: '#2d7a4fcc', borderRadius: 5, borderSkipped: false },
-    { type: 'bar',  label: 'Terkelola',      data: WASTE_MANAGED, backgroundColor: '#6dba8bcc', borderRadius: 5, borderSkipped: false },
-    {
-      type: 'line', label: 'Plastik', data: WASTE_PLASTIC,
-      borderColor: '#1a5c34', backgroundColor: 'transparent',
-      borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#1a5c34',
-      pointBorderColor: '#fff', pointBorderWidth: 2, tension: 0.4,
-    },
-  ];
-
+function IndonesiaWasteDualChart() {
   const chartData = {
-    labels: WASTE_YEARS,
-    datasets: chartType === 'multi' ? multiDatasets : [buildSingleDataset()],
+    labels: ['Total Timbulan', 'Total Terkelola'],
+    datasets: YEARS.map((year, idx) => ({
+      label: year,
+      data: YEAR_VALUES[year],
+      backgroundColor: YEAR_COLORS[idx],
+      borderRadius: 6,
+      borderSkipped: false,
+      barPercentage: 0.85,
+      categoryPercentage: 0.75,
+    })),
   };
 
   const chartOptions = {
@@ -121,388 +78,415 @@ function IndonesiaWasteChart() {
     plugins: {
       legend: { display: false },
       tooltip: {
-        ...CHART_TOOLTIP_OPTS,
-        callbacks: { label: (c) => ` ${c.formattedValue} jt ton` },
+        backgroundColor: '#144327',
+        titleFont: { size: 12, weight: 'bold' },
+        bodyFont: { size: 11 },
+        padding: 10,
+        cornerRadius: 8,
+        callbacks: {
+          label: (c) => ` ${c.dataset.label}: ${c.raw} Juta Ton`,
+        },
       },
     },
     scales: {
       x: {
-        ticks: { font: { family: "'DM Sans', sans-serif", size: 11 }, color: '#94a3b8' },
-        grid:  { display: false },
-        border:{ display: false },
+        grid: { display: false },
+        ticks: { font: { size: 12, weight: 'bold' }, color: '#4A6352' },
+        border: { display: false },
       },
       y: {
+        suggestedMax: 35,
+        grid: { color: 'rgba(46, 125, 50, 0.08)' },
         ticks: {
-          font: { family: "'DM Sans', sans-serif", size: 11 },
-          color: '#94a3b8',
-          callback: (v) => v + ' jt',
+          font: { size: 11 },
+          color: '#718A7A',
+          callback: (v) => `${v} jt`,
         },
-        grid:  { color: 'rgba(0,0,0,0.05)' },
-        border:{ display: false },
-        suggestedMax: 45,
+        border: { display: false },
       },
     },
   };
 
-  const legends = chartType === 'multi'
-    ? [
-        { color: '#2d7a4f', label: 'Total timbulan' },
-        { color: '#6dba8b', label: 'Terkelola' },
-        { color: '#1a5c34', label: 'Plastik (garis)' },
-      ]
-    : [{ color: metricMap[activeMetric].color, label: metricMap[activeMetric].label }];
-
   return (
-    <div className="db-iw-card">
-      <div className="db-iw-header">
-        <div>
-          <h2 className="db-iw-title">Tren sampah Indonesia 2020–2025</h2>
-          <p className="db-iw-sub">Sumber: SIPSN · Kementerian Lingkungan Hidup dan Kehutanan</p>
-        </div>
-        <div className="db-iw-controls">
-          {['bar','line','multi'].map((t) => (
-            <button
-              key={t}
-              className={`db-ctrl-btn ${chartType === t ? 'active' : ''}`}
-              onClick={() => setChartType(t)}
-            >
-              {t === 'bar' ? 'Batang' : t === 'line' ? 'Garis' : 'Multi'}
-            </button>
-          ))}
-        </div>
+    <div className="db-waste-hero-card">
+      <div className="db-waste-header">
+        <h2 className="db-waste-title">Timbulan Sampah Indonesia 2020-2026</h2>
+        <p className="db-waste-subtitle">
+          *2026 merupakan proyeksi berdasarkan tren data 2020-2025*
+        </p>
       </div>
 
-      {chartType !== 'multi' && (
-        <div className="db-iw-metrics">
-          {Object.entries(metricMap).map(([key, m]) => (
-            <button
-              key={key}
-              className={`db-iw-metric ${activeMetric === key ? 'active' : ''}`}
-              onClick={() => setActiveMetric(key)}
-            >
-              <span className="db-iw-metric__dot" style={{ background: m.color }} />
-              {m.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className="db-iw-legend">
-        {legends.map((l) => (
-          <span key={l.label} className="db-iw-legend-item">
-            <span className="db-iw-legend-dot" style={{ background: l.color }} />
-            {l.label}
-          </span>
-        ))}
+      <div className="db-waste-chart-container">
+        <Bar data={chartData} options={chartOptions} />
       </div>
 
-      <div className="db-iw-canvas-wrap">
-        {(chartType === 'bar' || chartType === 'multi') ? (
-          <Bar data={chartData} options={chartOptions} />
-        ) : (
-          <Line data={chartData} options={chartOptions} />
-        )}
-      </div>
-
-      <div className="db-iw-comp">
-        <p className="db-iw-comp-title">Komposisi jenis sampah 2025</p>
-        {WASTE_COMP_2025.map((w) => (
-          <div key={w.label} className="db-iw-comp-row">
-            <span className="db-iw-comp-label">{w.label}</span>
-            <div className="db-iw-comp-track">
-              <div
-                className="db-iw-comp-fill"
-                style={{ width: `${w.pct}%`, background: w.color }}
-              />
-            </div>
-            <span className="db-iw-comp-pct">{w.pct}%</span>
+      {/* Year legend dots */}
+      <div className="db-waste-year-legend">
+        {YEARS.map((y, idx) => (
+          <div key={y} className="legend-year-pill">
+            <span className="year-dot" style={{ background: YEAR_COLORS[idx] }}></span>
+            <span>{y}</span>
           </div>
         ))}
       </div>
-
-      <p className="db-iw-note">
-        *Variasi angka antar tahun karena perbedaan jumlah kab/kota pelapor. 2024: 317 kab/kota; 2025: 244 kab/kota.
-      </p>
     </div>
   );
 }
 
-// ── Main Dashboard ────────────────────────────────────────────────────────────
+// ── Main Dashboard Component ──────────────────────────────────────────────────
 export default function Dashboard() {
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState(null);
-  const [data, setData]             = useState(null);
-  const [selectedPkg, setSelectedPkg] = useState(null);
-  const [animIn, setAnimIn]         = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
+  const [selectedPkg, setSelectedPkg] = useState('1 Pohon');
 
   useEffect(() => {
     fetchDashboard()
       .then((res) => setData(res.data))
-      .catch(() => setError('Gagal memuat data dashboard.'))
-      .finally(() => {
-        setLoading(false);
-        setTimeout(() => setAnimIn(true), 50);
-      });
+      .catch(() => {
+        // Fallback mock data when offline or backend mock
+        setData({
+          summary: {
+            active_users: 9225,
+            co2_reduction_ton: 0.12,
+            co2_reduction_kg: 120,
+            total_weight: 48,
+            eco_credits: 919,
+            tree_impact_display: 12,
+          },
+          waste_by_type: {
+            organik: 19.2,
+            plastik: 12.0,
+            kertas: 7.2,
+            kardus: 4.8,
+            lainnya: 4.8,
+          },
+          user: { name: 'Sahabat Bumi' },
+        });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return (
-    <div className="db-layout">
-      <Sidebar />
-      <div className="db-loading">
-        <div className="db-spinner" />
-        <p>Memuat dashboard…</p>
+  if (loading) {
+    return (
+      <div className="db-layout-root">
+        <Sidebar />
+        <div className="db-loading-state">
+          <div className="db-loading-spinner" />
+          <p>Memuat dashboard Ecova…</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
-  if (error) return (
-    <div className="db-layout">
-      <Sidebar />
-      <div className="db-error">
-        <p>⚠️ {error}</p>
-        <button onClick={() => window.location.reload()}>Coba Lagi</button>
-      </div>
-    </div>
-  );
+  const summary = data?.summary || {
+    active_users: 9225,
+    co2_reduction_ton: 0.12,
+    total_weight: 48,
+    eco_credits: 919,
+    tree_impact_display: 12,
+  };
 
-  const { summary, monthly: monthlyRaw, waste_by_type, user } = data;
-  const monthly = Array.isArray(monthlyRaw) ? monthlyRaw : [];
-  const monthlyData = monthly.length > 0 ? monthly : [
-  { month: 'Okt', weight: 12.4, co2: 8.2 },
-  { month: 'Nov', weight: 18.7, co2: 12.4 },
-  { month: 'Des', weight: 15.2, co2: 10.1 },
-  { month: 'Jan', weight: 22.5, co2: 14.9 },
-  { month: 'Feb', weight: 19.8, co2: 13.1 },
-  { month: 'Mar', weight: 28.3, co2: 18.7 },
-  { month: 'Apr', weight: 31.0, co2: 20.5 },
-];
+  const treeCount = summary.tree_impact_display || 12;
+  const progressPercent = Math.min(Math.round((treeCount / TREE_TARGET) * 100), 100);
 
-  const treeProgress = Math.min((summary.tree_impact_display / TREE_TARGET) * 100, 100);
+  // Donut Material Breakdown Chart Data
+  const donutData = {
+    labels: ['Sampah Organik', 'Plastik', 'Kertas/Karton', 'Kardus', 'Lainnya'],
+    datasets: [
+      {
+        data: [40, 25, 15, 10, 10],
+        backgroundColor: ['#2E7D32', '#144327', '#66BB6A', '#8D6E63', '#A5D6A7'],
+        borderWidth: 0,
+        hoverOffset: 4,
+      },
+    ],
+  };
 
-  // Monthly impact chart
-  const monthlyChartData = {
-  labels: monthlyData.map((m) => m.month),
-  datasets: [
-    {
-      label: 'Sampah (kg)',
-      data: monthlyData.map((m) => m.weight ?? 0),
-      backgroundColor: '#2d7a4fcc',
-      borderRadius: 6,
-      borderSkipped: false,
-    },
-    {
-      label: 'CO₂ (kg)',
-      data: monthlyData.map((m) => m.co2 ?? 0),
-      type: 'line',
-      borderColor: '#1a5c34',
-      backgroundColor: 'transparent',
-      borderWidth: 2,
-      pointRadius: 3,
-      pointBackgroundColor: '#1a5c34',
-      tension: 0.4,
-    },
-  ],
-};
-
-  const monthlyChartOptions = {
+  const donutOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    cutout: '72%',
     plugins: {
       legend: { display: false },
-      tooltip: { ...CHART_TOOLTIP_OPTS },
-    },
-    scales: {
-      x: { ticks: { font: { size: 10 }, color: '#94a3b8' }, grid: { display: false }, border: { display: false } },
-      y: { ticks: { font: { size: 10 }, color: '#94a3b8' }, grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false } },
+      tooltip: {
+        backgroundColor: '#144327',
+        callbacks: {
+          label: (c) => ` ${c.label}: ${c.raw}%`,
+        },
+      },
     },
   };
 
   return (
-    <div className="db-layout">
+    <div className="db-layout-root">
+      {/* Left Sidebar */}
       <Sidebar />
 
-      <main className={`db-main ${animIn ? 'db-main--in' : ''}`}>
+      {/* Main Dashboard Content */}
+      <main className="db-main-content">
+        {/* Top Big Chart: Timbulan Sampah 2020-2026 */}
+        <IndonesiaWasteDualChart />
 
-        {/* ── Header ── */}
-        <div className="db-header">
-          <div>
-            <h1 className="db-header__title">
-              Selamat datang, {user?.name ?? 'Sahabat Bumi'} 👋
-            </h1>
-            <p className="db-header__sub">Ringkasan kontribusi lingkungan Anda hari ini</p>
-          </div>
-          <div className="db-header-badge">
-            <span className="db-live-dot" />
-            Data Terkini 2025
-          </div>
-        </div>
-
-        {/* ── Indonesia Waste Chart ── */}
-        <IndonesiaWasteChart />
-
-        {/* ── Summary Cards ── */}
-        <div className="db-cards-row">
-          <div className="db-summary-card">
-            <span className="db-summary-icon">👥</span>
-            <div className="db-summary-val">{summary.active_users.toLocaleString()}</div>
-            <div className="db-summary-label">Pengguna Aktif</div>
-            <span className="db-summary-badge">↑ 8.4%</span>
-          </div>
-          <div className="db-summary-card">
-            <span className="db-summary-icon">🌫</span>
-            <div className="db-summary-val">
-              {summary.co2_reduction_ton >= 1
-                ? `${summary.co2_reduction_ton.toFixed(1)} Ton`
-                : `${summary.co2_reduction_kg.toFixed(1)} kg`}
+        {/* ── 3 Summary Metrics ── */}
+        <div className="db-summary-triplet">
+          {/* Card 1 */}
+          <div className="db-triplet-card">
+            <div className="triplet-header-row">
+              <span className="triplet-tag">PARTISIPASI MASYARAKAT</span>
+              <span className="triplet-icon-box">👥</span>
             </div>
-            <div className="db-summary-label">CO₂ Dikurangi</div>
-            <span className="db-summary-badge">↑ 12%</span>
+            <div className="triplet-main-row">
+              <span className="triplet-number">9.225 User Aktif</span>
+              <span className="triplet-growth-badge">+8.4%</span>
+            </div>
           </div>
-          <div className="db-summary-card">
-            <span className="db-summary-icon">🌊</span>
-            <div className="db-summary-val">~{(summary.total_weight * 9.6).toFixed(0)} kg</div>
-            <div className="db-summary-label">Sampah Dicegah ke Laut</div>
-            <span className="db-summary-badge">↑ 18%</span>
+
+          {/* Card 2 */}
+          <div className="db-triplet-card">
+            <div className="triplet-header-row">
+              <span className="triplet-tag">PENGURANGAN EMISI CO₂</span>
+              <span className="triplet-icon-box">🍃</span>
+            </div>
+            <div className="triplet-main-row">
+              <span className="triplet-number">~138 Ton</span>
+              <span className="triplet-growth-badge">+12%</span>
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div className="db-triplet-card">
+            <div className="triplet-header-row">
+              <span className="triplet-tag">SAMPAH DICEGAH KE LAUT</span>
+              <span className="triplet-icon-box">🌊</span>
+            </div>
+            <div className="triplet-main-row">
+              <span className="triplet-number">~461 Ton</span>
+              <span className="triplet-growth-badge">+18%</span>
+            </div>
           </div>
         </div>
 
-        {/* ── Digital Forest + Tree ── */}
-        <div className="db-forest-row">
-          <div className="db-forest-card">
-            <div className="db-forest-card__overlay" />
-            <div className="db-forest-card__content">
-              <span className="db-forest-badge">🌿 Pertumbuhan: 12% minggu ini</span>
-              <h2 className="db-forest-title">Your Digital Forest<br />is Blooming</h2>
-              <div className="db-forest-stats">
-                <div className="db-forest-stat">
-                  <span className="db-forest-stat__label">Pengurangan CO₂</span>
-                  <span className="db-forest-stat__value">{summary.co2_reduction_ton.toFixed(2)} Ton</span>
-                </div>
-                <div className="db-forest-stat">
-                  <span className="db-forest-stat__label">Sampah Teralihkan</span>
-                  <span className="db-forest-stat__value">{summary.total_weight} kg</span>
-                </div>
-                <div className="db-forest-stat">
-                  <span className="db-forest-stat__label">Eco Credits</span>
-                  <span className="db-forest-stat__value">{Math.round(summary.eco_credits)}</span>
-                </div>
+        {/* ── Middle Row: Digital Forest & Tree Progress ── */}
+        <div className="db-forest-row-grid">
+          {/* Left Forest Visual Card */}
+          <div className="db-digital-forest-card">
+            <div className="forest-top-pill">
+              <span className="pill-leaf-dot">🌱</span>
+              Pertumbuhan 12.5 minggu ini
+            </div>
+            <h2 className="forest-headline">
+              Your Digital Forest<br />is Blooming
+            </h2>
+
+            <div className="forest-translucent-boxes">
+              <div className="translucent-stat-box">
+                <span className="stat-label-small">PENGURANGAN CO₂</span>
+                <strong className="stat-val-bold">0,12 Ton</strong>
+              </div>
+              <div className="translucent-stat-box">
+                <span className="stat-label-small">SAMPAH TERKELOLA</span>
+                <strong className="stat-val-bold">{summary.total_weight || 48} kg</strong>
+              </div>
+              <div className="translucent-stat-box">
+                <span className="stat-label-small">ECO CREDITS</span>
+                <strong className="stat-val-bold">{summary.eco_credits || 919}</strong>
               </div>
             </div>
           </div>
 
-          <div className="db-tree-card">
-            <div className="db-tree-icon">🍃</div>
-            <div className="db-tree-number">{summary.tree_impact_display}</div>
-            <p className="db-tree-label">Pohon yang Tertanam</p>
-            <div className="db-tree-bar-bg">
-              <div className="db-tree-bar-fill" style={{ width: `${treeProgress}%` }} />
+          {/* Right Tree Progress Card */}
+          <div className="db-tree-target-card">
+            <div className="tree-big-circle-icon">🍃</div>
+            <div className="tree-big-number">{treeCount}</div>
+            <span className="tree-unit-label">POHON YANG TERTANAM</span>
+
+            <div className="tree-progress-track">
+              <div
+                className="tree-progress-fill"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
-            <p className="db-tree-target">{treeProgress.toFixed(0)}% menuju target {TREE_TARGET} pohon</p>
+            <p className="tree-progress-caption">
+              {progressPercent}% menuju target {TREE_TARGET} pohon
+            </p>
           </div>
         </div>
 
-        {/* ── Local Roots + Planting ── */}
-        <div className="db-roots-row">
-          <div className="db-roots-card">
-            <span className="db-roots-badge">🌿 Local Roots</span>
-            <div className="db-roots-number">{LOCAL_ROOTS_TOTAL.toLocaleString('id-ID')}</div>
-            <p className="db-roots-desc">Pohon yang ditanam oleh komunitas kami di seluruh Indonesia.</p>
-            <div className="db-roots-contrib">
-              <div className="db-roots-ring">
-                <svg viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="10" />
+        {/* ── Row 3: Local Roots & Tanam Pohon Berikutnya ── */}
+        <div className="db-roots-planting-grid">
+          {/* Left: Local Roots */}
+          <div className="db-local-roots-card">
+            <div className="roots-tag-pill">
+              <span>📍</span> LOCAL ROOTS
+            </div>
+            <div className="roots-big-count">{LOCAL_ROOTS_TOTAL.toLocaleString('id-ID')}</div>
+            <p className="roots-description">
+              Pohon yang ditanam oleh komunitas kami di seluruh Indonesia.
+            </p>
+
+            <div className="roots-meter-box">
+              <div className="roots-donut-wrap">
+                <svg viewBox="0 0 100 100" className="roots-svg">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#D1E4CF" strokeWidth="8" />
                   <circle
-                    cx="50" cy="50" r="40"
-                    fill="none" stroke="#4a9e6b" strokeWidth="10"
-                    strokeDasharray={`${treeProgress * 2.51} 251`}
+                    cx="50"
+                    cy="50"
+                    r="38"
+                    fill="none"
+                    stroke="#2E7D32"
+                    strokeWidth="8"
+                    strokeDasharray="238"
+                    strokeDashoffset={238 - (238 * progressPercent) / 100}
                     strokeLinecap="round"
                     transform="rotate(-90 50 50)"
-                    style={{ transition: 'stroke-dasharray 1.2s ease' }}
                   />
                 </svg>
-                <div className="db-roots-ring-label">
-                  <span>{summary.tree_impact_display}</span>
+                <div className="roots-meter-text">
+                  <strong>{treeCount}</strong>
                   <small>Pohon</small>
                 </div>
               </div>
-              <div>
-                <p className="db-roots-contrib-title">Kontribusiku</p>
-                <p className="db-roots-contrib-sub">{(100 - treeProgress).toFixed(0)}% lagi untuk mencapai targetmu</p>
+              <div className="roots-meter-meta">
+                <strong>Kontribusiku</strong>
+                <p>Bagian dari restorasi ekosistem nasional</p>
               </div>
             </div>
           </div>
 
-          <div className="db-plant-card">
-            <h3 className="db-plant-title">Tanam Pohon Berikutnya</h3>
-            <p className="db-plant-desc">Pilih jumlah donasi untuk mengimbangi jejak karbon kamu.</p>
-            <div className="db-plant-packages">
+          {/* Right: Tanam Pohon Berikutnya */}
+          <div className="db-planting-card">
+            <h3 className="planting-card-title">Tanam Pohon Berikutnya</h3>
+            <p className="planting-card-desc">
+              Pilih paket donasi untuk mengimbangi jejak karbon kamu.
+            </p>
+
+            <div className="planting-pills-row">
               {PLANTING_PACKAGES.map((pkg) => (
                 <button
                   key={pkg.label}
-                  className={`db-plant-pkg ${selectedPkg === pkg.label ? 'db-plant-pkg--selected' : ''}`}
+                  type="button"
+                  className={`planting-pkg-pill ${selectedPkg === pkg.label ? 'active' : ''}`}
                   onClick={() => setSelectedPkg(pkg.label)}
                 >
-                  <span className="db-plant-pkg__label">{pkg.label}</span>
-                  <span className="db-plant-pkg__price">{pkg.price}</span>
+                  <span className="pkg-name">{pkg.label}</span>
+                  <span className="pkg-cost">{pkg.price}</span>
                 </button>
               ))}
             </div>
-            <div className="db-plant-progress">
-              <div className="db-plant-progress__bar-bg">
-                <div className="db-plant-progress__bar-fill" style={{ width: `${(summary.tree_impact_display / TREE_TARGET) * 100}%` }} />
+
+            <div className="planting-milestone-box">
+              <div className="milestone-text-row">
+                <span>Kemajuan Ke-{TREE_TARGET} Pohon</span>
+                <strong>{treeCount}/{TREE_TARGET} Pohon</strong>
               </div>
-              <div className="db-plant-progress__info">
-                <span>Kemajuan ke {TREE_TARGET} Pohon</span>
-                <span>{summary.tree_impact_display}/{TREE_TARGET} Pohon</span>
+              <div className="milestone-track">
+                <div
+                  className="milestone-fill"
+                  style={{ width: `${progressPercent}%` }}
+                />
               </div>
-              <p className="db-plant-progress__note">
-                Hanya {Math.max(TREE_TARGET - summary.tree_impact_display, 0)} pohon lagi untuk membuka lencana <strong>Penjaga Hutan!</strong>
+              <p className="milestone-footer-note">
+                Setiap pohon ditanam di kawasan restorasi hutan terverifikasi KLHK.
               </p>
             </div>
-            {selectedPkg && (
-              <button className="db-plant-cta">
-                Donasi {selectedPkg} Sekarang →
-              </button>
-            )}
           </div>
         </div>
 
-        {/* ── Monthly Impact + Badges ── */}
-        <div className="db-bottom-row">
-          <div className="db-impact-card">
-            <div className="db-impact-header">
-              <h3 className="db-impact-title">Dampak Bulananku</h3>
-              <div className="db-impact-legend">
-                <span><span className="db-legend-sq" style={{ background: '#2d7a4f' }} />Sampah (kg)</span>
-                <span><span className="db-legend-sq" style={{ background: '#1a5c34' }} />CO₂ (kg)</span>
-              </div>
+        {/* ── Row 4: Analisis Dampak & Penghargaan ── */}
+        <div className="db-analytics-badges-grid">
+          {/* Left: Analisis Dampak */}
+          <div className="db-analytics-card">
+            <div className="analytics-card-header">
+              <h3 className="analytics-title">Analisis Dampak</h3>
+              <button className="btn-timeframe-dropdown" type="button">
+                Tampilan Bulanan ▾
+              </button>
             </div>
-            <div className="db-impact-canvas">
-              <Bar data={monthlyChartData} options={monthlyChartOptions} />
+
+            <div className="monthly-target-banner">
+              <div className="target-text-row">
+                <span>Target Bulanan</span>
+                <strong>Pengalihan 20kg</strong>
+              </div>
+              <div className="target-bar-track">
+                <div className="target-bar-fill" style={{ width: '60%' }} />
+              </div>
+              <p className="target-hint-text">
+                12 kg didaur ulang bulan ini. Sisa 8 kg lagi untuk mencapai target!
+              </p>
+            </div>
+
+            {/* Donut Chart & Materials Breakdown */}
+            <div className="materials-breakdown-row">
+              <div className="donut-chart-wrapper">
+                <Doughnut data={donutData} options={donutOptions} />
+                <div className="donut-center-overlay">
+                  <span className="donut-total-label">TOTAL</span>
+                  <strong className="donut-total-weight">{summary.total_weight || 48}kg</strong>
+                </div>
+              </div>
+
+              <div className="materials-legend-column">
+                <span className="material-legend-title">Top Materials</span>
+                <div className="material-pill-item">
+                  <span className="mat-dot" style={{ background: '#2E7D32' }}></span>
+                  <span className="mat-name">Sampah Organik</span>
+                  <span className="mat-pct">40%</span>
+                </div>
+                <div className="material-pill-item">
+                  <span className="mat-dot" style={{ background: '#144327' }}></span>
+                  <span className="mat-name">Plastik</span>
+                  <span className="mat-pct">25%</span>
+                </div>
+                <div className="material-pill-item">
+                  <span className="mat-dot" style={{ background: '#66BB6A' }}></span>
+                  <span className="mat-name">Kertas/Karton</span>
+                  <span className="mat-pct">15%</span>
+                </div>
+                <div className="material-pill-item">
+                  <span className="mat-dot" style={{ background: '#8D6E63' }}></span>
+                  <span className="mat-name">Kardus</span>
+                  <span className="mat-pct">10%</span>
+                </div>
+                <div className="material-pill-item">
+                  <span className="mat-dot" style={{ background: '#A5D6A7' }}></span>
+                  <span className="mat-name">Lainnya</span>
+                  <span className="mat-pct">10%</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="db-badges-card">
-            <h3 className="db-badges-title">Penghargaan</h3>
-            <div className="db-badges-list">
-              {BADGES.map((b) => (
+          {/* Right: Penghargaan */}
+          <div className="db-badges-award-card">
+            <h3 className="badges-card-title">Penghargaan</h3>
+            <div className="badges-vertical-list">
+              {BADGES.map((badge) => (
                 <div
-                  key={b.id}
-                  className={`db-badge-item ${b.unlocked ? 'db-badge-item--unlocked' : 'db-badge-item--locked'}`}
+                  key={badge.id}
+                  className={`badge-row-card ${badge.unlocked ? 'is-unlocked' : 'is-locked'}`}
                 >
-                  <span className="db-badge-icon">{b.icon}</span>
-                  <div className="db-badge-info">
-                    <p className="db-badge-name">{b.name}</p>
-                    <p className="db-badge-desc">{b.desc}</p>
+                  <div className="badge-symbol-box">{badge.icon}</div>
+                  <div className="badge-meta-box">
+                    <h4 className="badge-item-name">{badge.name}</h4>
+                    <p className="badge-item-desc">{badge.desc}</p>
                   </div>
-                  {b.unlocked && <span className="db-badge-check">✓</span>}
                 </div>
               ))}
             </div>
-            <button className="db-badges-gallery-btn">Lihat Semua Lencana →</button>
+
+            <button
+              type="button"
+              className="btn-view-all-badges"
+              onClick={() => alert('Semua 12 lencana dapat dibuka melalui aksi daur ulang rutin!')}
+            >
+              Lihat semua badge →
+            </button>
           </div>
         </div>
 
+        {/* Global Footer */}
         <Footer />
       </main>
     </div>
