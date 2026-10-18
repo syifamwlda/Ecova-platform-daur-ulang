@@ -252,7 +252,8 @@ Buka browser dan akses `http://localhost:5173` untuk mulai menjelajahi aplikasi!
 - [ ] **Sertifikat Kontribusi Lingkungan:** Download sertifikat digital pengurang emisi karbon untuk keperluan portofolio CSR atau personal.
 
 ---
-
+link demo web:
+https://ecova-platform-daur-ulang.vercel.app/
 ## 👥 Tim & Pengembang
 
 Dikembangkan dengan dedikasi untuk mendukung kelestarian bumi dan masa depan yang lebih hijau 🌱.
